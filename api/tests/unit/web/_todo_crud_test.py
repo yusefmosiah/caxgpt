@@ -77,7 +77,7 @@ def test_get_todo_by_id_not_found(bearer, mock_todo_id):
     )
 
     assert response.status_code == 404
-    assert response.json() == {"detail": "Todo not found"}
+    assert response.json() == {"detailx": "Todo not found"}
 
 # DELETE /api/todos/{todo_id}
 
@@ -165,7 +165,7 @@ def test_update_todo_partial_authorized_notfound(bearer, mock_todo_id):
     }
 
 # Put /api/todos/{todo_id}
-    
+
 def test_update_invalid_todo_full(bearer, invalid_todo_id):
     updated_todo = {"title": "Updated Title",
                     "description": "Updated Description"}
@@ -210,7 +210,7 @@ def test_update_todo_full_authorized_notfound(bearer, mock_todo_id):
     }
 
 # POST /api/todos
-    
+
 def test_create_todo_unauthorized():
     response = client.post("/api/todos")
 
@@ -231,7 +231,7 @@ def test_create_todo_invalid(bearer):
     assert response.json() == {
     "detail": "Invalid authentication credentials"
 }
-    
+
 def test_create_todo_valid(bearer):
     new_todo = {
         "description": "cold"

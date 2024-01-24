@@ -31,7 +31,7 @@ app = FastAPI(
     },
     servers=[
         {
-            "url": "https://caxgpt.vercel.app",
+            "url": "https://localhost:8000",
             "description": "Production server"
         },
     ],
@@ -74,7 +74,7 @@ async def tokens_manager_oauth_codeflow(
         refresh_token (str)
     """
     return await gpt_tokens_service(grant_type, refresh_token, code)
-    
+
 
 # Get temp Code against user_id to implentent OAuth2 for Custom Gpt
 @app.get("/api/oauth/temp-code", tags=["OAuth2 Authentication"])
@@ -158,7 +158,7 @@ def get_todo_by_id(todo_id: UUID, db: Session = Depends(get_db), user_id: UUID =
 
     Returns:
         TODOResponse: TODO Response
-    
+
     """
     try:
         return get_todo_by_id_service(todo_id, db, user_id)
@@ -253,3 +253,7 @@ def delete_todo(todo_id: UUID, db: Session = Depends(get_db), user_id: UUID = De
     except Exception as e:
         # Handle specific exceptions with different HTTP status codes if needed
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
+@app.get("/hello")
+def hello_world():
+    return {"message": "Hello World"}

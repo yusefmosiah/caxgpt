@@ -16,7 +16,7 @@ The FastAPI includes fully managed oAuth service to manage multi users efficient
 
 The Custom GPT is connected to FastAPI microservice and using OAuth Authorization Code Flow Scheme for authentication & authorization.
 
-Backend Microservice and Frontend are developed in NextJS14 & Fastapi and deployed on Vercel. 
+Backend Microservice and Frontend are developed in NextJS14 & Fastapi and deployed on Vercel.
 
 ###### Live Code WalkThrough And Demo:
 
@@ -52,7 +52,7 @@ Backend Microservice and Frontend are developed in NextJS14 & Fastapi and deploy
 
 - The Custom Actions Are configured using OpenAI Spec
 - To Manage MultiUsers we are using OAuth Code Flow Authorization Scheme.
-- This Custom GPT can view all todos, add new tasks to list, update and delete them. 
+- This Custom GPT can view all todos, add new tasks to list, update and delete them.
 - User can manage todos themselves with nextjs14 web app.
 
 ##### Fun Fact: You can even call Custom GPT from mobile app and perform all these todo crud operations.
@@ -63,7 +63,7 @@ Backend Microservice and Frontend are developed in NextJS14 & Fastapi and deploy
 - Efficently handle Database Connections (open & close sessions for users)
 - OAuth Code Flow Authorization for Custom GPT to implement authentication and security
 - Configured Alembic to generate database schema and run migrations
-- SqlAlchemy ORM and Neon Serverless Postgress SQL Database 
+- SqlAlchemy ORM and Neon Serverless Postgress SQL Database
 - Complete Unit, End to End and Integration tests using pytest and uttitest
     - Unit Tests: 44
         - web layer: 23
@@ -79,7 +79,7 @@ Here's quick overview of how oAuth works with Custom GPT here:
 ![FastAPI EndPoints](./public/oauth.png)
 
 
-## Running the Project Locally 
+## Running the Project Locally
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -93,8 +93,8 @@ https://github.com/mjunaidca/....
 
 #### 2. Add Environment Variables
 
-Rename .env.template to .env and add environment variables. 
-1. For `DB` we are using SQL ALchemy ORM so you can add any database url. I will recommend vercel postgress or neon serverless postgress database. 
+Rename .env.template to .env and add environment variables.
+1. For `DB` we are using SQL ALchemy ORM so you can add any database url. I will recommend vercel postgress or neon serverless postgress database.
 2. For `BACKEND_URL` during local testing and http://localhost:3000 and in production add vercel deplyment url.
 
 #### 3. Run Database Migrations
