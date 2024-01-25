@@ -31,7 +31,7 @@ app = FastAPI(
     },
     servers=[
         {
-            "url": "https://caxgpt-lilac.vercel.app/",
+            "url": "https://caxgpt-lilac.vercel.app",
             "description": "Production server"
         },
     ],
