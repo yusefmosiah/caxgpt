@@ -29,8 +29,12 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
   console.log('signup_request', signup_request.status, signup_request.statusText);
 
   if (signup_request.status !== 200) {
-    const error = await signup_request.json();
-    return { error: error.detail };
+    if (!signup_request.ok) {
+        return { error: `Request failed with status ${signup_request.status}` };
+      }
+
+      const error = await signup_request.json();
+      return { error: error.detail };
   }
 
   return { success: "Signup Success - Please Login!" };
