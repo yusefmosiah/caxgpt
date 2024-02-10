@@ -16,14 +16,14 @@ from .service._todos_crud import create_todo_service, get_todo_by_id_service, ge
 from .utils._helpers import get_current_user_dep
 
 app = FastAPI(
-    title="Cax",
-    description="A multi-user to-do microservice with NextJS14 web app and Multi User Custom GPT for efficient task management.",
-    version="1.0.0",
-    terms_of_service="https://caxgpt.vercel.app/terms/",
+    title="Choir",
+    description="Choir Chat",
+    version="2.0.0",
+    # terms_of_service="https://caxgpt.vercel.app/terms/",
     contact={
-        "name": "Muhammad Junaid",
-        "url": "https://caxgpt.vercel.app/contact/",
-        "email": "dp@x-force.example.com",
+        "name": "Yusef Mosiah Nathanson",
+        # "url": "https://caxgpt.vercel.app/contact/",
+        "email": "yusef@choir.chat",
     },
     license_info={
         "name": "Apache 2.0",
