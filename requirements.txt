@@ -8,3 +8,5 @@ passlib
 python-multipart
 pytest-mock
 pytest-asyncio
+openai
+qdrant-client

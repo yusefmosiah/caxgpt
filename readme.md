@@ -1,161 +1,102 @@
-# CaX: Applied GenAI Multi User Todo GPT App
+# Choir
 
-Chat or Talk with TasksPal GPT on ChatGPT interface and review the updates live NextJS Web App :D
+Aspirationally, Choir Chat is a metachat app — initially in the form of a gpt — that turns the chat thread into an interface into a "socioeconomic media platform" new form of social media.
 
-A. NextJS Web Interface
+Indeed, Choir Chat is the world's first AI native social media platform.
 
-https://choir.chat/
+The primary objective motivating the development of Choir is the need for a new form of social discourse, one that is intelligent, civil, and inclusive of the broad range of perspectives that comprise humanity.
 
-B. ChatGPT Cax TasksPal GPT
+Current social media platforms fail in that most users consume the content that a small minority creates.
 
-https://chat.openai.com/g/g-fC8sZoDCi-cax-taskpal
+Chat apps — and ChatGPT as a special case — show that all people have something to say. It's just that on social media as we know it, most people don't have good incentives for posting.
 
-The FastAPI includes fully managed oAuth service to manage multi users efficiently.
+The way that social algorithms work, most content created by most users gets minimal attention. And given the way that society processes social media, one would rather have an empty social profile than post a lot but have low follower count.
 
-## How it Works?
+Really, the downside of posting something that sends the wrong impression — everything offends someone these days, it seems — outweighs the upside of posting, in most cases.
 
-The Custom GPT is connected to FastAPI microservice and using OAuth Authorization Code Flow Scheme for authentication & authorization.
+The solution to the problem of oversensitivity and self censorship is of course anonymity, a solution that brings its own problems. Anonymity means sometimes people feel licensed to express their worst qualities, and you get eg 4chan.
 
-Backend Microservice and Frontend are developed in NextJS14 & Fastapi and deployed on Vercel.
+For this reason, Choir is built as a gpt, leveraging chatgpt's content moderation. If anything, this means the content may be too tame.
 
-###### Live Code WalkThrough And Demo:
+## Socioeconomic media
 
-[<img src="https://img.youtube.com/vi/q_LwcflLUrQ/hqdefault.jpg" width="580" height="360"
-/>](https://www.youtube.com/embed/q_LwcflLUrQ)
+But removing disincentives for posting with anonymity is not enough. Users need positive incentives to post their thoughts with the internet public.
 
-### Custom GPT Interface (Chat or Talk to Manage Tasks)
+The people who do post often on social media get social, financial, and political value for the time and energy they expend creating content.
 
-![Cax TaskPal GPT](./public/gpt.png)
+However, most people aren't in a position where the value they get from social media outweighs the cost.
 
-### NextJS User Dashboard
+With Choir, all users get value for the time and energy they contribute.
 
-![NextJS User Dashboard](./public/nextjs.png)
+A complex content ecosystem, Choir has 3 different incentive systems that together create an environment which encourages and rewards contributing novel ideas before they beocome widely considered to be important.
 
-### FastAPI Microservice Endpoints
+In essence, Choir incentivizes people to compete to cooperate to create quality content about complex concepts.
 
-![FastAPI EndPoints](./public/endpoints.png)
+### NOVELTY REWARD
 
-## Features And Tech Stack
+Each message you post with Choir, your message gets compared with all other messages in the Choir database, and the more different the content is from all existing content, the greater your reward in VOICE
 
-1. Backend: FastAPI for efficient and scalable backend microservoice.
-2. Frontend: Next.js14 for a responsive and dynamic user interface.
-3. Custom GPT: Chat or talks to manage all your tasks.
+### QUOTATION REWARD
 
-### NextJS14
+Each message Choir receives gets compared to all other messages in the Choir database, and the most valualbe, relevant, similar messages get quoted to you by the choir gpt
+The authors of all quoted messages get rewarded VOICE
 
-- Use Server Actions for all User Actions
-- Middleware andCustom Authentication Flow Using FastAPI Backend OAuth service to implement user Authentication & Secure Routes
-- Streaming and Suspense to enchance UI
-- A custom todos management dashboard for all users
-- Shadcn UI and Tailwind Css for UI engineering
+### CURATION MARKET
 
-### Cax TaskPal Custom GPT
+When you come across a message that you value, you can invest some of your VOICE in it, increasing its probability of getting quoted to other users, and rewarding its author and prior curators.
+Essentially, curation is paying to get more attention on the message and simultaneously betting that it will get curated by others in the future.
+When you curate, you may optionally add a message to send to the author and prior curators.
+In effect, curators of a message form a private group chat with its author
 
-- The Custom Actions Are configured using OpenAI Spec
-- To Manage MultiUsers we are using OAuth Code Flow Authorization Scheme.
-- This Custom GPT can view all todos, add new tasks to list, update and delete them.
-- User can manage todos themselves with nextjs14 web app.
 
-##### Fun Fact: You can even call Custom GPT from mobile app and perform all these todo crud operations.
+These 3 incentivized interactions are conducted within the choir gpt,
 
-### FastAPI Microservice
+To use choir gpt, you must be logged into an account on choir.chat. If you are not currently logged in, you will be directed from within chatgpt to register or login to your account.
 
-- OAuth Protocol for User registration and authentication
-- CRUD operations for todos
-- Efficently handle Database Connections (open & close sessions for users)
-- OAuth Code Flow Authorization for Custom GPT to implement authentication and security
-- Configured Alembic to generate database schema and run migrations
-- SqlAlchemy ORM and Neon Serverless Postgress SQL Database
-- Complete Unit, End to End and Integration tests using pytest and uttitest
-  - Unit Tests: 44
-    - web layer: 23
-    - service layer: 13
-    - data layer: 8
-  - End-to-End (E2E) Tests: 17
-  - Integration Tests: 2
+## Choir.chat
 
-`root api directoy: Contains the FastAPI backend microservice code, including API routes, models, and database configurations.`
+Choir.chat allows signed-in users to view, search, curate, edit, and delete (from choir, not from chatgpt) their own messages, as well as view, search, and curate other user's messages.
 
-Here's quick overview of how oAuth works with Custom GPT here:
+There needs to be an account dashboard component search component, a list_of_messages component, a message component, and a curate_message component
 
-![FastAPI EndPoints](./public/oauth.png)
+account dashboard:
 
-## Running the Project Locally
+- VOICE balance
+- unread messages count
+- curated messages count
+- quoted by messages count
+- authored messages count
+- more stats derived from these tbd
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-#### 1. Clone the project
+message lists:
 
-```
-https://github.com/mjunaidca/....
-```
+- unread messages
+    - unread messages that quote one of my messages
+    - unread messages from cocurators of messages ive curated
+- user's messages
+    - user-authored messages
+    - user-curated messages
+- conversations
+    - messages that quote one of my messages
+    - messages from cocurators of messagesi ive curated
+- all messages
 
-Run pnpm install to install the missing dependencies
+sort orders:
+- recency
+- VOICE
+- curator count
+- quotation count
 
-#### 2. Add Environment Variables
 
-Rename .env.template to .env and add environment variables.
+message component displays message content and metadata
 
-1. For `DB` we are using SQL ALchemy ORM so you can add any database url. I will recommend vercel postgress or neon serverless postgress database.
-2. For `BACKEND_URL` during local testing and http://localhost:3000 and in production add vercel deplyment url.
+- content
+- metadata
+    - created_at_time
+    - VOICE_TOTAL = VOICE_INVESTED + VOICE_REWARDED
+        - dict of curator_id: VOICE_INVESTED
+        - dict of messages that quote it: VOICE_REWARDED
+- author_id is not returned by api or displayed to users
 
-#### 3. Run Database Migrations
-
-In terminal run:
-
-- `alembic revision --autogenerate -m "Add Todos Table`
-
-- `alembic upgrade head`
-
-#### 4. Run Project Locally
-
-Run pnpm install to install the missing dependencies
-
-#### 5. Vercel Deplyment
-
-Delete the .next and **pucache** and .mypy... cache files and follow the steps:
-
-a. Run `vercel link` and then add all env variables to vercel deplyment. Replace the localhost vars with vercel deoloyment link
-
-b. Finally run `vercel --prod` to deploy the project.
-
-## Testing
-
-This project includes 44 unit tests, 17 end-to-end tests, and 2 integration tests to ensure software quality and reliability.
-
-## The Inspiration
-
-Inspired by the need for a personalized, AI-driven task management tool, this project is a journey towards creating an app that not only assists in managing daily tasks but also learns and adapts to the user's lifestyle and preferences.
-
-## Thoughts & Contributions
-
-Feel free to ask any questions or provide feedback. Contributions are also welcome!
-
-## Helpful Resources for Custom GPT OAuth Dev.
-
-OAuth 2.0 Authorization Code Grant Type
-
-- https://developer.okta.com/blog/2018/04/10/oauth-authorization-code-grant-type#:~:text=The%20Authorization%20Code%20Grant%20Type,used%20OAuth%202.0%20grant%20types.
-
-The Token URL Response:
-
-- https://community.openai.com/t/guide-how-oauth-refresh-tokens-revocation-work-with-gpt-actions/533147
-
-Understand oauth code flow
-
-- https://www.oauth.com/oauth2-servers/single-page-apps/
-
-Authorization Code Grant
-
-- https://www.oauth.com/oauth2-servers/server-side-apps/authorization-code/
-
-How OAuth refresh tokens & revocation work with GPT Actions
-
-- https://community.openai.com/t/guide-how-oauth-refresh-tokens-revocation-work-with-gpt-actions/533147
-
-#### To Study:
-
-- https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow
-- https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce
-- https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow
-- https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use
+curate_message component has parameters for amount of VOICE to invest, optional message text
