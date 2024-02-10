@@ -4,7 +4,7 @@ Chat or Talk with TasksPal GPT on ChatGPT interface and review the updates live 
 
 A. NextJS Web Interface
 
-https://caxgpt.vercel.app/
+https://choir.chat/
 
 B. ChatGPT Cax TasksPal GPT
 
@@ -42,6 +42,7 @@ Backend Microservice and Frontend are developed in NextJS14 & Fastapi and deploy
 3. Custom GPT: Chat or talks to manage all your tasks.
 
 ### NextJS14
+
 - Use Server Actions for all User Actions
 - Middleware andCustom Authentication Flow Using FastAPI Backend OAuth service to implement user Authentication & Secure Routes
 - Streaming and Suspense to enchance UI
@@ -58,6 +59,7 @@ Backend Microservice and Frontend are developed in NextJS14 & Fastapi and deploy
 ##### Fun Fact: You can even call Custom GPT from mobile app and perform all these todo crud operations.
 
 ### FastAPI Microservice
+
 - OAuth Protocol for User registration and authentication
 - CRUD operations for todos
 - Efficently handle Database Connections (open & close sessions for users)
@@ -65,19 +67,18 @@ Backend Microservice and Frontend are developed in NextJS14 & Fastapi and deploy
 - Configured Alembic to generate database schema and run migrations
 - SqlAlchemy ORM and Neon Serverless Postgress SQL Database
 - Complete Unit, End to End and Integration tests using pytest and uttitest
-    - Unit Tests: 44
-        - web layer: 23
-        - service layer: 13
-        - data layer: 8
-    - End-to-End (E2E) Tests: 17
-    - Integration Tests: 2
+  - Unit Tests: 44
+    - web layer: 23
+    - service layer: 13
+    - data layer: 8
+  - End-to-End (E2E) Tests: 17
+  - Integration Tests: 2
 
 `root api directoy: Contains the FastAPI backend microservice code, including API routes, models, and database configurations.`
 
 Here's quick overview of how oAuth works with Custom GPT here:
 
 ![FastAPI EndPoints](./public/oauth.png)
-
 
 ## Running the Project Locally
 
@@ -89,11 +90,12 @@ These instructions will get you a copy of the project up and running on your loc
 https://github.com/mjunaidca/....
 ```
 
- Run pnpm install to install the missing dependencies
+Run pnpm install to install the missing dependencies
 
 #### 2. Add Environment Variables
 
 Rename .env.template to .env and add environment variables.
+
 1. For `DB` we are using SQL ALchemy ORM so you can add any database url. I will recommend vercel postgress or neon serverless postgress database.
 2. For `BACKEND_URL` during local testing and http://localhost:3000 and in production add vercel deplyment url.
 
@@ -111,17 +113,18 @@ Run pnpm install to install the missing dependencies
 
 #### 5. Vercel Deplyment
 
-Delete the .next and __pucache__ and .mypy... cache files and follow the steps:
+Delete the .next and **pucache** and .mypy... cache files and follow the steps:
 
 a. Run `vercel link` and then add all env variables to vercel deplyment. Replace the localhost vars with vercel deoloyment link
 
 b. Finally run `vercel --prod` to deploy the project.
 
-
 ## Testing
+
 This project includes 44 unit tests, 17 end-to-end tests, and 2 integration tests to ensure software quality and reliability.
 
 ## The Inspiration
+
 Inspired by the need for a personalized, AI-driven task management tool, this project is a journey towards creating an app that not only assists in managing daily tasks but also learns and adapts to the user's lifestyle and preferences.
 
 ## Thoughts & Contributions
