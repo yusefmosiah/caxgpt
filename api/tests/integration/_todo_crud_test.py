@@ -46,9 +46,7 @@ def test_todo_creation_in_database(bearer):
         "description": "Test TODO Description",
         "completed": False,
     }
-    response = client.post(
-        "/api/todos/", json=todo_data, headers={"Authorization": f"Bearer {bearer}"}
-    )
+    response = client.post("/api/todos/", json=todo_data, headers={"Authorization": f"Bearer {bearer}"})
     assert response.status_code == 201
     data = response.json()
     assert data["title"] == "Test TODO"
@@ -56,9 +54,7 @@ def test_todo_creation_in_database(bearer):
     assert data["completed"] == False
 
     # Cleanup
-    client.delete(
-        f"/api/todos/{data['id']}", headers={"Authorization": f"Bearer {bearer}"}
-    )
+    client.delete(f"/api/todos/{data['id']}", headers={"Authorization": f"Bearer {bearer}"})
 
 
 # Test to get todo by id

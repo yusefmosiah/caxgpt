@@ -41,9 +41,7 @@ def upgrade() -> None:
         unique=False,
     )
     op.create_index(op.f("ix_users_table_id"), "users_table", ["id"], unique=False)
-    op.create_index(
-        op.f("ix_users_table_username"), "users_table", ["username"], unique=True
-    )
+    op.create_index(op.f("ix_users_table_username"), "users_table", ["username"], unique=True)
     op.create_table(
         "todos_table",
         sa.Column("id", sa.UUID(), nullable=False),
@@ -57,9 +55,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_todos_table_id"), "todos_table", ["id"], unique=False)
-    op.create_index(
-        op.f("ix_todos_table_title"), "todos_table", ["title"], unique=False
-    )
+    op.create_index(op.f("ix_todos_table_title"), "todos_table", ["title"], unique=False)
     # ### end Alembic commands ###
 
 

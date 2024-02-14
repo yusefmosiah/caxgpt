@@ -20,6 +20,7 @@ from ..utils._helpers import (
     validate_refresh_token,
     get_current_user_dep,
 )
+
 from ..data._user_auth import get_user, db_signup_users, InvalidUserException
 
 _: bool = load_dotenv(find_dotenv())

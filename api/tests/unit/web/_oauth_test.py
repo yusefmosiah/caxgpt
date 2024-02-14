@@ -54,9 +54,7 @@ def mock_user_output(mock_user_db):
 
 @pytest.fixture
 def mock_login_response(mock_user_output):
-    return LoginResonse(
-        access_token="testtoken", token_type="bearer", user=mock_user_output
-    )
+    return LoginResonse(access_token="testtoken", token_type="bearer", user=mock_user_output)
 
 
 # Endpoints for OAuth2 Authentication
@@ -64,9 +62,7 @@ def mock_login_response(mock_user_output):
 
 # api/oauth/signup
 def test_signup_missing_fullname():
-    response = client.post(
-        "/api/oauth/signup", json={"email": "test@example.com", "username": "test"}
-    )
+    response = client.post("/api/oauth/signup", json={"email": "test@example.com", "username": "test"})
     assert response.status_code == 422
     assert response.json() == {
         "detail": [
@@ -97,12 +93,10 @@ def test_signup_duplicate(mock_register_user):
 # /api/auth/login
 # Test successful login: Send valid credentials and assert the correct response.
 def test_successful_login(mock_user_db, mock_user_output):
-    with patch(
-        "api.service._user_auth.service_login_for_access_token", new_callable=AsyncMock
-    ), patch("api.service._user_auth.get_user", return_value=mock_user_db):
-        response = client.post(
-            "/api/oauth/login", data={"username": "test", "password": "testpass"}
-        )
+    with patch("api.service._user_auth.service_login_for_access_token", new_callable=AsyncMock), patch(
+        "api.service._user_auth.get_user", return_value=mock_user_db
+    ):
+        response = client.post("/api/oauth/login", data={"username": "test", "password": "testpass"})
 
         assert response.status_code == 200
         response_data = response.json()
@@ -139,9 +133,7 @@ def test_successful_login(mock_user_db, mock_user_output):
 def test_login_with_invalid_credentials():
     with patch(
         "api.service._user_auth.service_login_for_access_token", new_callable=AsyncMock
-    ) as mock_login_service, patch(
-        "api.service._user_auth.get_user", return_value=None
-    ):
+    ) as mock_login_service, patch("api.service._user_auth.get_user", return_value=None):
         response = client.post(
             "/api/oauth/login",
             data={"username": "wrong_user", "password": "wrong_password"},
@@ -158,9 +150,7 @@ def test_login_with_invalid_credentials():
 def test_login_with_incomplete_data():
     with patch(
         "api.service._user_auth.service_login_for_access_token", new_callable=AsyncMock
-    ) as mock_login_service, patch(
-        "api.service._user_auth.get_user", return_value=None
-    ):
+    ) as mock_login_service, patch("api.service._user_auth.get_user", return_value=None):
         response = client.post("/api/oauth/login", data={"username": "test"})
 
         assert response.status_code == 422
@@ -231,9 +221,7 @@ def test_tokens_manager_oauth_code_flow_with_failed_refresh_token():
 
     # Mock gpt_tokens_service to raise an HTTPException for an invalid or expired token
     with patch("api.service._user_auth.gpt_tokens_service") as mock_service:
-        mock_service.side_effect = HTTPException(
-            status_code=401, detail="Token invalid or expired"
-        )
+        mock_service.side_effect = HTTPException(status_code=401, detail="Token invalid or expired")
 
         response = client.post(
             "/api/oauth/token",
@@ -269,9 +257,7 @@ def test_tokens_manager_oauth_code_flow_with_refresh_token():
         return_value="some_user_id",
     ):
         # Mock gpt_tokens_service to return the mock response
-        with patch(
-            "api.service._user_auth.gpt_tokens_service", return_value=mock_response
-        ):
+        with patch("api.service._user_auth.gpt_tokens_service", return_value=mock_response):
             response = client.post(
                 "/api/oauth/token",
                 data={

@@ -28,9 +28,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["user_id"], ["users_table.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_messages_table_id"), "messages_table", ["id"], unique=False
-    )
+    op.create_index(op.f("ix_messages_table_id"), "messages_table", ["id"], unique=False)
     # ### end Alembic commands ###
 
 

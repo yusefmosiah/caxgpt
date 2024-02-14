@@ -48,9 +48,7 @@ app = FastAPI(
 
 
 # user_auth.py web layer routes
-@app.post(
-    "/api/oauth/login", response_model=LoginResonse, tags=["OAuth2 Authentication"]
-)
+@app.post("/api/oauth/login", response_model=LoginResonse, tags=["OAuth2 Authentication"])
 async def login_authorization(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db),
@@ -107,9 +105,7 @@ async def get_temp_code(user_id: UUID):
     return {"code": code}
 
 
-@app.post(
-    "/api/oauth/signup", response_model=UserOutput, tags=["OAuth2 Authentication"]
-)
+@app.post("/api/oauth/signup", response_model=UserOutput, tags=["OAuth2 Authentication"])
 async def signup_users(user_data: RegisterUser, db: Session = Depends(get_db)):
     """
     Signup Users
@@ -154,11 +150,7 @@ def get_todos(
         all_todos = get_all_todos_service(db, user_id, offset, per_page)
 
         # Calculate next and previous page URLs
-        next_page = (
-            f"?page={page + 1}&per_page={per_page}"
-            if len(all_todos) == per_page
-            else None
-        )
+        next_page = f"?page={page + 1}&per_page={per_page}" if len(all_todos) == per_page else None
         previous_page = f"?page={page - 1}&per_page={per_page}" if page > 1 else None
 
         # Return data in paginated format
@@ -206,9 +198,7 @@ def get_todo_by_id(
 
 
 # Create a new TODO item
-@app.post(
-    "/api/todos", response_model=TODOResponse, tags=["TODO Crud"], status_code=201
-)
+@app.post("/api/todos", response_model=TODOResponse, tags=["TODO Crud"], status_code=201)
 def create_todo(
     todo: TODOBase,
     db: Session = Depends(get_db),

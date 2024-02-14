@@ -33,14 +33,10 @@ def get_user(db, username: Union[str, None] = None):
 async def db_signup_users(user_data: RegisterUser, db: Session):
     # Check if user already exists
     existing_user = (
-        db.query(USER)
-        .filter((USER.username == user_data.username) | (USER.email == user_data.email))
-        .first()
+        db.query(USER).filter((USER.username == user_data.username) | (USER.email == user_data.email)).first()
     )
     if existing_user:
-        raise InvalidUserException(
-            status_code=400, detail="Email or username already registered"
-        )
+        raise InvalidUserException(status_code=400, detail="Email or username already registered")
 
     # Hash the password
     hashed_password = get_password_hash(user_data.password)

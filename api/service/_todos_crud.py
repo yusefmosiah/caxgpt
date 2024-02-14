@@ -19,9 +19,7 @@ from uuid import UUID
 
 
 # get all TODO items
-def get_all_todos_service(
-    db: Session, user_id: UUID, offset: int, per_page: int
-) -> list[TODOResponse]:
+def get_all_todos_service(db: Session, user_id: UUID, offset: int, per_page: int) -> list[TODOResponse]:
     """
     Get all TODO items with pagination from the database.
 
@@ -91,9 +89,7 @@ def create_todo_service(todo_data: TODOBase, db: Session, user_id: UUID) -> TODO
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-def full_update_todo_service(
-    todo_id: UUID, todo_data: TODOBase, db: Session, user_id: UUID
-) -> TODO:
+def full_update_todo_service(todo_id: UUID, todo_data: TODOBase, db: Session, user_id: UUID) -> TODO:
     """
     Update an existing TODO item.
 
@@ -120,9 +116,7 @@ def full_update_todo_service(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-def partial_update_todo_service(
-    todo_id: UUID, todo_data: TODOBase, db: Session, user_id: UUID
-) -> TODO:
+def partial_update_todo_service(todo_id: UUID, todo_data: TODOBase, db: Session, user_id: UUID) -> TODO:
     """
     Partially update an existing TODO item.
 

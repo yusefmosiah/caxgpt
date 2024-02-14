@@ -40,9 +40,7 @@ def test_authenticate_user(mocker):
 def test_create_access_token(mocker):
     mocker.patch("api.service._user_auth.jwt.encode", return_value="encoded_jwt")
 
-    result = create_access_token(
-        {"sub": "username", "id": "user_id"}, timedelta(minutes=30)
-    )
+    result = create_access_token({"sub": "username", "id": "user_id"}, timedelta(minutes=30))
 
     assert result == "encoded_jwt"
 
@@ -78,12 +76,8 @@ async def test_service_login_for_access_token(mocker):
     mock_user.username = "username"
     mock_user.id = "user_id"
     mocker.patch("api.service._user_auth.authenticate_user", return_value=mock_user)
-    mocker.patch(
-        "api.service._user_auth.create_access_token", return_value="access_token"
-    )
-    mocker.patch(
-        "api.service._user_auth.create_refresh_token", return_value="refresh_token"
-    )
+    mocker.patch("api.service._user_auth.create_access_token", return_value="access_token")
+    mocker.patch("api.service._user_auth.create_refresh_token", return_value="refresh_token")
 
     result = await service_login_for_access_token(mock_form_data, mock_db)
 
@@ -106,15 +100,9 @@ async def test_service_signup_users(mocker):
 
 @pytest.mark.asyncio
 async def test_gpt_tokens_service(mocker):
-    mocker.patch(
-        "api.service._user_auth.validate_refresh_token", return_value="user_id"
-    )
-    mocker.patch(
-        "api.service._user_auth.create_access_token", return_value="access_token"
-    )
-    mocker.patch(
-        "api.service._user_auth.create_refresh_token", return_value="refresh_token"
-    )
+    mocker.patch("api.service._user_auth.validate_refresh_token", return_value="user_id")
+    mocker.patch("api.service._user_auth.create_access_token", return_value="access_token")
+    mocker.patch("api.service._user_auth.create_refresh_token", return_value="refresh_token")
 
     result = await gpt_tokens_service("refresh_token", "refresh_token")
 

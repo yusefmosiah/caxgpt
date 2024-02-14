@@ -66,9 +66,7 @@ def test_get_todo_by_id_unauthorized(mock_todo_id):
 
 
 def test_get_todo_by_id_not_found(bearer, mock_todo_id):
-    response = client.get(
-        f"/api/todos/{mock_todo_id}", headers={"Authorization": f"Bearer {bearer}"}
-    )
+    response = client.get(f"/api/todos/{mock_todo_id}", headers={"Authorization": f"Bearer {bearer}"})
 
     assert response.status_code == 404
     assert response.json() == {"detailx": "Todo not found"}
@@ -78,9 +76,7 @@ def test_get_todo_by_id_not_found(bearer, mock_todo_id):
 
 
 def test_delete_todo_invalid_id(bearer, invalid_todo_id):
-    response = client.delete(
-        f"/api/todos/{invalid_todo_id}", headers={"Authorization": f"Bearer {bearer}"}
-    )
+    response = client.delete(f"/api/todos/{invalid_todo_id}", headers={"Authorization": f"Bearer {bearer}"})
 
     assert response.status_code == 422
     assert response.json() == {
@@ -90,9 +86,7 @@ def test_delete_todo_invalid_id(bearer, invalid_todo_id):
                 "loc": ["path", "todo_id"],
                 "msg": "Input should be a valid UUID, invalid group length in group 4: expected 12, found 10",
                 "input": "10c25fc2-835b-4ef3-bb3d-bf44fe496e",
-                "ctx": {
-                    "error": "invalid group length in group 4: expected 12, found 10"
-                },
+                "ctx": {"error": "invalid group length in group 4: expected 12, found 10"},
                 "url": "https://errors.pydantic.dev/2.5/v/uuid_parsing",
             }
         ]
@@ -100,9 +94,7 @@ def test_delete_todo_invalid_id(bearer, invalid_todo_id):
 
 
 def test_delete_todo_mock_id(bearer, mock_todo_id):
-    response = client.delete(
-        f"/api/todos/{mock_todo_id}", headers={"Authorization": f"Bearer {bearer}"}
-    )
+    response = client.delete(f"/api/todos/{mock_todo_id}", headers={"Authorization": f"Bearer {bearer}"})
 
     assert response.status_code == 500
     assert response.json() == {
@@ -130,9 +122,7 @@ def test_update_invalid_todo_partial(bearer, invalid_todo_id):
                 "loc": ["path", "todo_id"],
                 "msg": "Input should be a valid UUID, invalid group length in group 4: expected 12, found 10",
                 "input": "10c25fc2-835b-4ef3-bb3d-bf44fe496e",
-                "ctx": {
-                    "error": "invalid group length in group 4: expected 12, found 10"
-                },
+                "ctx": {"error": "invalid group length in group 4: expected 12, found 10"},
                 "url": "https://errors.pydantic.dev/2.5/v/uuid_parsing",
             }
         ]
@@ -170,9 +160,7 @@ def test_update_invalid_todo_full(bearer, invalid_todo_id):
                 "loc": ["path", "todo_id"],
                 "msg": "Input should be a valid UUID, invalid group length in group 4: expected 12, found 10",
                 "input": "10c25fc2-835b-4ef3-bb3d-bf44fe496e",
-                "ctx": {
-                    "error": "invalid group length in group 4: expected 12, found 10"
-                },
+                "ctx": {"error": "invalid group length in group 4: expected 12, found 10"},
                 "url": "https://errors.pydantic.dev/2.5/v/uuid_parsing",
             }
         ]

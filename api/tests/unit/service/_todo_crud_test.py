@@ -39,9 +39,7 @@ class TestTodoService:
         self.db = Mock(spec=Session)
         self.user_id = uuid4()
         self.todo_id = uuid4()
-        self.todo_data = TODOBase(
-            title="Test", description="Test description", completed=False
-        )
+        self.todo_data = TODOBase(title="Test", description="Test description", completed=False)
 
     @patch("api.service._todos_crud.get_all_todo_data")
     def test_get_all_todos_service(self, mock_get_all, setup):
@@ -61,16 +59,12 @@ class TestTodoService:
     @patch("api.service._todos_crud.full_update_todo_data")
     def test_full_update_todo_service(self, mock_update, setup):
         full_update_todo_service(self.todo_id, self.todo_data, self.db, self.user_id)
-        mock_update.assert_called_once_with(
-            self.todo_id, self.todo_data, self.db, self.user_id
-        )
+        mock_update.assert_called_once_with(self.todo_id, self.todo_data, self.db, self.user_id)
 
     @patch("api.service._todos_crud.partial_update_todo_data")
     def test_partial_update_todo_service(self, mock_update, setup):
         partial_update_todo_service(self.todo_id, self.todo_data, self.db, self.user_id)
-        mock_update.assert_called_once_with(
-            self.todo_id, self.todo_data, self.db, self.user_id
-        )
+        mock_update.assert_called_once_with(self.todo_id, self.todo_data, self.db, self.user_id)
 
     @patch("api.service._todos_crud.delete_todo_data")
     def test_delete_todo_service(self, mock_delete, setup):

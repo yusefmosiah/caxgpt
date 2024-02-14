@@ -52,9 +52,7 @@ def test_get_single_todo_data():
     with patch("api.data._todos_crud.TODO") as mock_todo:
         get_single_todo_data(todo_id, db, user_id)
         db.query.assert_called_once_with(mock_todo)
-        db.query().filter.assert_called_once_with(
-            mock_todo.id == todo_id, mock_todo.user_id == user_id
-        )
+        db.query().filter.assert_called_once_with(mock_todo.id == todo_id, mock_todo.user_id == user_id)
         db.query().filter().first.assert_called_once()
 
 
@@ -76,9 +74,7 @@ def test_full_update_todo_data():
     with patch("api.data._todos_crud.TODO") as mock_todo:
         full_update_todo_data(todo_id, todo_data, db, user_id)
         db.query.assert_called_once_with(mock_todo)
-        db.query().filter.assert_called_once_with(
-            mock_todo.id == todo_id, mock_todo.user_id == user_id
-        )
+        db.query().filter.assert_called_once_with(mock_todo.id == todo_id, mock_todo.user_id == user_id)
         db.query().filter().first.assert_called_once()
         db.commit.assert_called_once()
 
@@ -92,9 +88,7 @@ def test_partial_update_todo_data():
     with patch("api.data._todos_crud.TODO") as mock_todo:
         partial_update_todo_data(todo_id, todo_data, db, user_id)
         db.query.assert_called_once_with(mock_todo)
-        db.query().filter.assert_called_once_with(
-            mock_todo.id == todo_id, mock_todo.user_id == user_id
-        )
+        db.query().filter.assert_called_once_with(mock_todo.id == todo_id, mock_todo.user_id == user_id)
         db.query().filter().first.assert_called_once()
         db.commit.assert_called_once()
 
@@ -107,9 +101,7 @@ def test_delete_todo_data():
     with patch("api.data._todos_crud.TODO") as mock_todo:
         delete_todo_data(todo_id, db, user_id)
         db.query.assert_called_once_with(mock_todo)
-        db.query().filter.assert_called_once_with(
-            mock_todo.id == todo_id, mock_todo.user_id == user_id
-        )
+        db.query().filter.assert_called_once_with(mock_todo.id == todo_id, mock_todo.user_id == user_id)
         db.query().filter().first.assert_called_once()
         db.delete.assert_called_once()
         db.commit.assert_called_once()

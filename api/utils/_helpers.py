@@ -60,9 +60,7 @@ async def validate_refresh_token(refresh_token: str) -> Union[str, None]:
         if not isinstance(ALGORITHM, str):
             raise ValueError("ALGORITHM must be a string")
 
-        payload: dict[str, Any] = jwt.decode(
-            refresh_token, SECRET_KEY, algorithms=[ALGORITHM]
-        )
+        payload: dict[str, Any] = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: Union[str, None] = payload.get("id")
 
         # If user_id is None, the token is invalid
@@ -83,9 +81,7 @@ def create_refresh_token(data: dict, expires_delta: Union[timedelta, None] = Non
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            days=7
-        )  # Set the expiration time for refresh tokens to 7 days
+        expire = datetime.now(timezone.utc) + timedelta(days=7)  # Set the expiration time for refresh tokens to 7 days
 
     to_encode.update({"exp": expire})
 

@@ -4,9 +4,7 @@ import pytest
 
 @pytest.fixture
 def temp_code():
-    response = requests.get(
-        "http://localhost:8000/api/oauth/temp-code?user_id=471db65c-6c9c-47d6-afc4-250dd4583baf"
-    )
+    response = requests.get("http://localhost:8000/api/oauth/temp-code?user_id=471db65c-6c9c-47d6-afc4-250dd4583baf")
     data = response.json()
     code = data["code"]
     return code
@@ -15,9 +13,7 @@ def temp_code():
 @pytest.fixture
 def refresh_token():
     login_data = {"username": "junaid", "password": "junaid"}
-    response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/login", data=login_data  # Send as form data
-    )
+    response = requests.post("http://127.0.0.1:8000/api/oauth/login", data=login_data)  # Send as form data
     assert response.status_code == 200
     data = response.json()
     return data["refresh_token"]
@@ -30,9 +26,7 @@ def refresh_token():
 
 def test_login_with_in_valid_credentials():
     login_data = {"username": "junaid", "password": "1jun45aid"}
-    response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/login", data=login_data  # Send as form data
-    )
+    response = requests.post("http://127.0.0.1:8000/api/oauth/login", data=login_data)  # Send as form data
     # If you are expecting a 401 Unauthorized, then use 401 in the assertion
     assert response.status_code == 401
     assert response.json() == {"detail": "Incorrect username or password"}
@@ -40,9 +34,7 @@ def test_login_with_in_valid_credentials():
 
 def test_login_with_valid_credentials():
     login_data = {"username": "junaid", "password": "junaid"}
-    response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/login", data=login_data  # Send as form data
-    )
+    response = requests.post("http://127.0.0.1:8000/api/oauth/login", data=login_data)  # Send as form data
     assert response.status_code == 200
 
 
@@ -55,9 +47,7 @@ def test_register_with_already_registerd_email():
         "password": "string",
     }
 
-    response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/signup", json=register_data
-    )
+    response = requests.post("http://127.0.0.1:8000/api/oauth/signup", json=register_data)
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Email or username already registered"}
@@ -71,9 +61,7 @@ def test_register_with_already_registerd_username():
         "password": "string",
     }
 
-    response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/signup", json=register_data
-    )
+    response = requests.post("http://127.0.0.1:8000/api/oauth/signup", json=register_data)
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Email or username already registered"}
@@ -83,9 +71,7 @@ def test_register_with_already_registerd_username():
 
 
 def test_get_oauth_temp_code():
-    response = requests.get(
-        "http://localhost:8000/api/oauth/temp-code?user_id=471db65c-6c9c-47d6-afc4-250dd4583baf"
-    )
+    response = requests.get("http://localhost:8000/api/oauth/temp-code?user_id=471db65c-6c9c-47d6-afc4-250dd4583baf")
     assert response.status_code == 200
 
 
@@ -186,9 +172,7 @@ def test_token_manager_invalid_refresh_token():
 
 
 def test_token_manager_missing_grant():
-    response = requests.post(
-        "http://localhost:8000/api/oauth/token", data={"code": "invalid_temp_code"}
-    )
+    response = requests.post("http://localhost:8000/api/oauth/token", data={"code": "invalid_temp_code"})
 
     assert response.status_code == 422
     assert response.json() == {

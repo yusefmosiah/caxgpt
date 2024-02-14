@@ -7,9 +7,7 @@ import pytest
 @pytest.fixture
 def bearer():
     login_data = {"username": "junaid", "password": "junaid"}
-    response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/login", data=login_data  # Send as form data
-    )
+    response = requests.post("http://127.0.0.1:8000/api/oauth/login", data=login_data)  # Send as form data
     assert response.status_code == 200
     return response.json()["access_token"]
 

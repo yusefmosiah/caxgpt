@@ -13,24 +13,16 @@ class ThoughtSpace:
         qdrant_api_key=None,
     ):
         # Use provided API keys or source from environment
-        self.openai_api_key = (
-            openai_api_key if openai_api_key else os.environ.get("OPENAI_API_KEY")
-        )
+        self.openai_api_key = openai_api_key if openai_api_key else os.environ.get("OPENAI_API_KEY")
         self.qdrant_url = qdrant_url if qdrant_url else os.environ.get("QDRANT_URL")
-        self.qdrant_api_key = (
-            qdrant_api_key if qdrant_api_key else os.environ.get("QDRANT_API_KEY")
-        )
+        self.qdrant_api_key = qdrant_api_key if qdrant_api_key else os.environ.get("QDRANT_API_KEY")
 
         self.openai_client = AsyncOpenAI(api_key=self.openai_api_key)
-        self.qdrant_client = AsyncQdrantClient(
-            url=self.qdrant_url, api_key=self.qdrant_api_key
-        )
+        self.qdrant_client = AsyncQdrantClient(url=self.qdrant_url, api_key=self.qdrant_api_key)
         self.collection_name = collection_name
 
     async def embed(self, input_text, model_name="text-embedding-ada-002"):
-        embedding_response = await self.openai_client.embeddings.create(
-            input=input_text, model=model_name
-        )
+        embedding_response = await self.openai_client.embeddings.create(input=input_text, model=model_name)
         return embedding_response.data[0].embedding
 
     async def search(self, embedding, search_limit=200, with_vectors=False):
@@ -54,9 +46,7 @@ class ThoughtSpace:
         return deduplicated_results
 
     async def retrieve(self, ids):
-        return await self.qdrant_client.retrieve(
-            collection_name=self.collection_name, ids=ids
-        )
+        return await self.qdrant_client.retrieve(collection_name=self.collection_name, ids=ids)
 
     async def set_payload(self, payload, points):
         """
@@ -66,9 +56,7 @@ class ThoughtSpace:
         - payload (dict): The payload data to set.
         - points (list): A list of point IDs to which the payload data will be applied.
         """
-        await self.qdrant_client.set_payload(
-            collection_name=self.collection_name, payload=payload, points=points
-        )
+        await self.qdrant_client.set_payload(collection_name=self.collection_name, payload=payload, points=points)
 
     async def process_query(
         self,
@@ -124,9 +112,7 @@ class ThoughtSpace:
         updates = []
         for point in points:
             # Check if 'voice' exists in the payload and access it, otherwise default to 0
-            current_voice = (
-                point.payload.get("voice", 0) if isinstance(point.payload, dict) else 0
-            )
+            current_voice = point.payload.get("voice", 0) if isinstance(point.payload, dict) else 0
             # Calculate the new voice value
             new_voice = current_voice + id_voice_pairs.get(point.id, 0)
             # Prepare the updated payload with the new voice value
