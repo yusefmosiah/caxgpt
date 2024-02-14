@@ -25,25 +25,17 @@ client = TestClient(app)
 
 @pytest.fixture
 def bearer():
-    login_data = {
-        "username": "junaid",
-        "password": "junaid"
-    }
-    response = requests.post(
-        "http://localhost:8000/api/oauth/login",
-        data=login_data
-    )
+    login_data = {"username": "junaid", "password": "junaid"}
+    response = requests.post("http://localhost:8000/api/oauth/login", data=login_data)
     assert response.status_code == 200
     return response.json()["access_token"]
+
 
 # Test to get all todos
 
 
 def test_read_all_todos(bearer):
-    response = client.get(
-        "api/todos/",
-        headers={"Authorization": f"Bearer {bearer}"}
-    )
+    response = client.get("api/todos/", headers={"Authorization": f"Bearer {bearer}"})
     assert response.status_code == 200
 
 
@@ -52,12 +44,10 @@ def test_todo_creation_in_database(bearer):
     todo_data = {
         "title": "Test TODO",
         "description": "Test TODO Description",
-        "completed": False
+        "completed": False,
     }
     response = client.post(
-        "/api/todos/",
-        json=todo_data,
-        headers={"Authorization": f"Bearer {bearer}"}
+        "/api/todos/", json=todo_data, headers={"Authorization": f"Bearer {bearer}"}
     )
     assert response.status_code == 201
     data = response.json()
@@ -66,9 +56,9 @@ def test_todo_creation_in_database(bearer):
     assert data["completed"] == False
 
     # Cleanup
-    client.delete(f"/api/todos/{data['id']}",
-                  headers={"Authorization": f"Bearer {bearer}"})
+    client.delete(
+        f"/api/todos/{data['id']}", headers={"Authorization": f"Bearer {bearer}"}
+    )
+
 
 # Test to get todo by id
-
-

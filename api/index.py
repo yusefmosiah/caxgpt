@@ -9,10 +9,21 @@ from uuid import UUID
 # Now you can use relative imports
 from .data._db_config import get_db
 from .models._user_auth import RegisterUser, UserOutput, LoginResonse, GPTToken
-from .service._user_auth import service_signup_users, service_login_for_access_token, create_access_token, gpt_tokens_service
-from .data._db_config import get_db
+from .service._user_auth import (
+    service_signup_users,
+    service_login_for_access_token,
+    create_access_token,
+    gpt_tokens_service,
+)
 from .models._todo_crud import TODOBase, TODOResponse, PaginatedTodos
-from .service._todos_crud import create_todo_service, get_todo_by_id_service, get_all_todos_service, full_update_todo_service, partial_update_todo_service, delete_todo_data
+from .service._todos_crud import (
+    create_todo_service,
+    get_todo_by_id_service,
+    get_all_todos_service,
+    full_update_todo_service,
+    partial_update_todo_service,
+    delete_todo_data,
+)
 from .utils._helpers import get_current_user_dep
 
 app = FastAPI(
@@ -27,20 +38,23 @@ app = FastAPI(
     },
     license_info={
         "name": "Apache 2.0",
-        "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
     },
     servers=[
-        {
-            "url": "https://caxgpt-lilac.vercel.app",
-            "description": "Production server"
-        },
+        {"url": "https://caxgpt-lilac.vercel.app", "description": "Production server"},
     ],
-    docs_url="/api/docs"
+    docs_url="/api/docs",
 )
 
+
 # user_auth.py web layer routes
-@app.post("/api/oauth/login", response_model=LoginResonse, tags=["OAuth2 Authentication"])
-async def login_authorization(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
+@app.post(
+    "/api/oauth/login", response_model=LoginResonse, tags=["OAuth2 Authentication"]
+)
+async def login_authorization(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Session = Depends(get_db),
+):
     """
     Authorization URL for OAuth2
 
@@ -53,11 +67,12 @@ async def login_authorization(form_data: Annotated[OAuth2PasswordRequestForm, De
     """
     return await service_login_for_access_token(form_data, db)
 
+
 @app.post("/api/oauth/token", response_model=GPTToken, tags=["OAuth2 Authentication"])
 async def tokens_manager_oauth_codeflow(
     grant_type: str = Form(...),
     refresh_token: Optional[str] = Form(None),
-    code: Optional[str] = Form(None)
+    code: Optional[str] = Form(None),
 ):
     """
     Token URl For OAuth Code Grant Flow
@@ -92,10 +107,10 @@ async def get_temp_code(user_id: UUID):
     return {"code": code}
 
 
-@app.post("/api/oauth/signup", response_model=UserOutput, tags=["OAuth2 Authentication"])
-async def signup_users(
-    user_data: RegisterUser, db: Session = Depends(get_db)
-):
+@app.post(
+    "/api/oauth/signup", response_model=UserOutput, tags=["OAuth2 Authentication"]
+)
+async def signup_users(user_data: RegisterUser, db: Session = Depends(get_db)):
     """
     Signup Users
 
@@ -108,12 +123,18 @@ async def signup_users(
     """
     return await service_signup_users(user_data, db)
 
+
 #  todos_crud.py web layer routes
+
 
 # Get ALL TODOS
 @app.get("/api/todos", response_model=PaginatedTodos, tags=["TODO Crud"])
-def get_todos(db: Session = Depends(get_db), user_id: UUID = Depends(get_current_user_dep), page: int = Query(1, description="Page number", ge=1),
-              per_page: int = Query(10, description="Items per page", ge=1, le=100)):
+def get_todos(
+    db: Session = Depends(get_db),
+    user_id: UUID = Depends(get_current_user_dep),
+    page: int = Query(1, description="Page number", ge=1),
+    per_page: int = Query(10, description="Items per page", ge=1, le=100),
+):
     """
     Get ALL TODOS
 
@@ -133,11 +154,20 @@ def get_todos(db: Session = Depends(get_db), user_id: UUID = Depends(get_current
         all_todos = get_all_todos_service(db, user_id, offset, per_page)
 
         # Calculate next and previous page URLs
-        next_page = f"?page={page + 1}&per_page={per_page}" if len(all_todos) == per_page else None
+        next_page = (
+            f"?page={page + 1}&per_page={per_page}"
+            if len(all_todos) == per_page
+            else None
+        )
         previous_page = f"?page={page - 1}&per_page={per_page}" if page > 1 else None
 
         # Return data in paginated format
-        paginated_data = {"count": len(all_todos), "next": next_page, "previous": previous_page, "todos": all_todos}
+        paginated_data = {
+            "count": len(all_todos),
+            "next": next_page,
+            "previous": previous_page,
+            "todos": all_todos,
+        }
 
         return paginated_data
         # return get_all_todos_service(db, user_id)
@@ -145,9 +175,14 @@ def get_todos(db: Session = Depends(get_db), user_id: UUID = Depends(get_current
         # Handle specific exceptions with different HTTP status codes if needed
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
+
 # Get a Single TODO item
 @app.get("/api/todos/{todo_id}", response_model=TODOResponse, tags=["TODO Crud"])
-def get_todo_by_id(todo_id: UUID, db: Session = Depends(get_db), user_id: UUID = Depends(get_current_user_dep)):
+def get_todo_by_id(
+    todo_id: UUID,
+    db: Session = Depends(get_db),
+    user_id: UUID = Depends(get_current_user_dep),
+):
     """
     Get a Single TODO item
 
@@ -171,8 +206,14 @@ def get_todo_by_id(todo_id: UUID, db: Session = Depends(get_db), user_id: UUID =
 
 
 # Create a new TODO item
-@app.post("/api/todos", response_model=TODOResponse, tags=["TODO Crud"], status_code=201)
-def create_todo(todo: TODOBase, db: Session = Depends(get_db), user_id: UUID = Depends(get_current_user_dep)):
+@app.post(
+    "/api/todos", response_model=TODOResponse, tags=["TODO Crud"], status_code=201
+)
+def create_todo(
+    todo: TODOBase,
+    db: Session = Depends(get_db),
+    user_id: UUID = Depends(get_current_user_dep),
+):
     """
     Create a new TODO item
 
@@ -190,9 +231,15 @@ def create_todo(todo: TODOBase, db: Session = Depends(get_db), user_id: UUID = D
         # Handle specific exceptions with different HTTP status codes if needed
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
+
 # Update a Single TODO item Completly
 @app.put("/api/todos/{todo_id}", response_model=TODOResponse, tags=["TODO Crud"])
-def update_todo(todo_id: UUID, updated_todo: TODOBase, db: Session = Depends(get_db), user_id: UUID = Depends(get_current_user_dep)):
+def update_todo(
+    todo_id: UUID,
+    updated_todo: TODOBase,
+    db: Session = Depends(get_db),
+    user_id: UUID = Depends(get_current_user_dep),
+):
     """
     Update a Single TODO item Completly
 
@@ -214,7 +261,12 @@ def update_todo(todo_id: UUID, updated_todo: TODOBase, db: Session = Depends(get
 
 # Update a Single TODO item partially
 @app.patch("/api/todos/{todo_id}", response_model=TODOResponse, tags=["TODO Crud"])
-def update_todo_partial(todo_id: UUID, updated_todo: TODOBase, db: Session = Depends(get_db), user_id: UUID = Depends(get_current_user_dep)):
+def update_todo_partial(
+    todo_id: UUID,
+    updated_todo: TODOBase,
+    db: Session = Depends(get_db),
+    user_id: UUID = Depends(get_current_user_dep),
+):
     """
     Partially Update a Single TODO item
 
@@ -236,7 +288,11 @@ def update_todo_partial(todo_id: UUID, updated_todo: TODOBase, db: Session = Dep
 
 # DELETE a single TODO item
 @app.delete("/api/todos/{todo_id}", tags=["TODO Crud"])
-def delete_todo(todo_id: UUID, db: Session = Depends(get_db), user_id: UUID = Depends(get_current_user_dep)):
+def delete_todo(
+    todo_id: UUID,
+    db: Session = Depends(get_db),
+    user_id: UUID = Depends(get_current_user_dep),
+):
     """
     Delete a Single TODO item
 
@@ -253,6 +309,7 @@ def delete_todo(todo_id: UUID, db: Session = Depends(get_db), user_id: UUID = De
     except Exception as e:
         # Handle specific exceptions with different HTTP status codes if needed
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
 
 @app.get("/hello")
 def hello_world():

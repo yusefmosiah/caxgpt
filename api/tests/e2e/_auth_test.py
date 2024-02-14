@@ -1,4 +1,3 @@
-
 import requests
 import pytest
 
@@ -15,17 +14,14 @@ def temp_code():
 
 @pytest.fixture
 def refresh_token():
-    login_data = {
-        "username": "junaid",
-        "password": "junaid"
-    }
+    login_data = {"username": "junaid", "password": "junaid"}
     response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/login",
-        data=login_data  # Send as form data
+        "http://127.0.0.1:8000/api/oauth/login", data=login_data  # Send as form data
     )
     assert response.status_code == 200
     data = response.json()
     return data["refresh_token"]
+
 
 # Test Authorization Endpoints
 
@@ -33,13 +29,9 @@ def refresh_token():
 
 
 def test_login_with_in_valid_credentials():
-    login_data = {
-        "username": "junaid",
-        "password": "1jun45aid"
-    }
+    login_data = {"username": "junaid", "password": "1jun45aid"}
     response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/login",
-        data=login_data  # Send as form data
+        "http://127.0.0.1:8000/api/oauth/login", data=login_data  # Send as form data
     )
     # If you are expecting a 401 Unauthorized, then use 401 in the assertion
     assert response.status_code == 401
@@ -47,13 +39,9 @@ def test_login_with_in_valid_credentials():
 
 
 def test_login_with_valid_credentials():
-    login_data = {
-        "username": "junaid",
-        "password": "junaid"
-    }
+    login_data = {"username": "junaid", "password": "junaid"}
     response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/login",
-        data=login_data  # Send as form data
+        "http://127.0.0.1:8000/api/oauth/login", data=login_data  # Send as form data
     )
     assert response.status_code == 200
 
@@ -64,17 +52,15 @@ def test_register_with_already_registerd_email():
         "username": "string",
         "email": "junaid@gmail.com",
         "full_name": "string",
-        "password": "string"
+        "password": "string",
     }
 
     response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/signup",
-        json=register_data
+        "http://127.0.0.1:8000/api/oauth/signup", json=register_data
     )
 
     assert response.status_code == 400
-    assert response.json() == {
-        "detail": "Email or username already registered"}
+    assert response.json() == {"detail": "Email or username already registered"}
 
 
 def test_register_with_already_registerd_username():
@@ -82,17 +68,16 @@ def test_register_with_already_registerd_username():
         "username": "junaid",
         "email": "string@gmail.com",
         "full_name": "string",
-        "password": "string"
+        "password": "string",
     }
 
     response = requests.post(
-        "http://127.0.0.1:8000/api/oauth/signup",
-        json=register_data
+        "http://127.0.0.1:8000/api/oauth/signup", json=register_data
     )
 
     assert response.status_code == 400
-    assert response.json() == {
-        "detail": "Email or username already registered"}
+    assert response.json() == {"detail": "Email or username already registered"}
+
 
 # OAUTH Code Flow Temp Code Endpoint
 
@@ -103,19 +88,17 @@ def test_get_oauth_temp_code():
     )
     assert response.status_code == 200
 
+
 # OAUTH Code Flow Token Endpoints
 
-    # Authorized Code Grant Type
+# Authorized Code Grant Type
 
 
 def test_token_manager_valid(temp_code):
     print("temp_code", temp_code)
     response = requests.post(
         "http://localhost:8000/api/oauth/token",
-        data={
-            "grant_type": "authorization_code",
-            "code": temp_code
-        }
+        data={"grant_type": "authorization_code", "code": temp_code},
     )
 
     assert response.status_code == 200
@@ -138,6 +121,7 @@ def test_token_manager_valid(temp_code):
     # test expiry time and token type
     assert response.json()["expires_in"] is not None
     assert response.json()["token_type"] == "bearer"
+
 
 # OAUTH Code Flow Refresh Token Endpoint
 
@@ -145,10 +129,7 @@ def test_token_manager_valid(temp_code):
 def test_refresh_code_grant_valid(refresh_token):
     response = requests.post(
         "http://localhost:8000/api/oauth/token",
-        data={
-            "grant_type": "refresh_token",
-            "refresh_token": refresh_token
-        }
+        data={"grant_type": "refresh_token", "refresh_token": refresh_token},
     )
 
     assert response.status_code == 200
@@ -172,16 +153,14 @@ def test_refresh_code_grant_valid(refresh_token):
     assert response.json()["expires_in"] is not None
     assert response.json()["token_type"] == "bearer"
 
+
 # test invalid temp code
 
 
 def test_token_manager_invalid_tempcode():
     response = requests.post(
         "http://localhost:8000/api/oauth/token",
-        data={
-            "grant_type": "authorization_code",
-            "code": "invalid_temp_code"
-        }
+        data={"grant_type": "authorization_code", "code": "invalid_temp_code"},
     )
 
     assert response.status_code == 401
@@ -191,28 +170,24 @@ def test_token_manager_invalid_tempcode():
 def test_token_manager_invalid_refresh_token():
     response = requests.post(
         "http://localhost:8000/api/oauth/token",
-        data={
-            "grant_type": "refresh_token",
-            "refresh_token": "invalid_refresh_token"
-        }
+        data={"grant_type": "refresh_token", "refresh_token": "invalid_refresh_token"},
     )
 
     assert response.status_code == 401
-    assert response.json() == {"detail": {
-        "error": "invalid_token",
-        "error_description": "The access token expired"
+    assert response.json() == {
+        "detail": {
+            "error": "invalid_token",
+            "error_description": "The access token expired",
+        }
     }
-    }
+
 
 # Missing Grant
 
 
 def test_token_manager_missing_grant():
     response = requests.post(
-        "http://localhost:8000/api/oauth/token",
-        data={
-            "code": "invalid_temp_code"
-        }
+        "http://localhost:8000/api/oauth/token", data={"code": "invalid_temp_code"}
     )
 
     assert response.status_code == 422
@@ -220,13 +195,10 @@ def test_token_manager_missing_grant():
         "detail": [
             {
                 "type": "missing",
-                "loc": [
-                    "body",
-                    "grant_type"
-                ],
+                "loc": ["body", "grant_type"],
                 "msg": "Field required",
                 "input": None,
-                "url": "https://errors.pydantic.dev/2.5/v/missing"
+                "url": "https://errors.pydantic.dev/2.5/v/missing",
             }
         ]
     }

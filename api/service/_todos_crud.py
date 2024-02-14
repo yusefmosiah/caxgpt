@@ -5,12 +5,23 @@ from fastapi import HTTPException
 
 from ..data._sqlalchemy_models import TODO
 from ..models._todo_crud import TODOBase, TODOResponse
-from ..data._todos_crud import create_todo_data, get_single_todo_data, get_all_todo_data, full_update_todo_data, partial_update_todo_data, delete_todo_data, TodoNotFoundError
+from ..data._todos_crud import (
+    create_todo_data,
+    get_single_todo_data,
+    get_all_todo_data,
+    full_update_todo_data,
+    partial_update_todo_data,
+    delete_todo_data,
+    TodoNotFoundError,
+)
 
 from uuid import UUID
 
+
 # get all TODO items
-def get_all_todos_service(db: Session, user_id: UUID, offset: int, per_page: int) -> list[TODOResponse]:
+def get_all_todos_service(
+    db: Session, user_id: UUID, offset: int, per_page: int
+) -> list[TODOResponse]:
     """
     Get all TODO items with pagination from the database.
 
@@ -31,6 +42,7 @@ def get_all_todos_service(db: Session, user_id: UUID, offset: int, per_page: int
         print(f"Error getting all TODO items with pagination: {e}")
         # Re-raise the exception to be handled at the endpoint level
         raise
+
 
 # get a single TODO item
 def get_todo_by_id_service(todo_id: UUID, db: Session, user_id: UUID) -> TODO:
@@ -64,8 +76,12 @@ def create_todo_service(todo_data: TODOBase, db: Session, user_id: UUID) -> TODO
         TODO: The created TODO item.
     """
     try:
-        db_todo = TODO(title=todo_data.title,
-                       description=todo_data.description, completed=todo_data.completed, user_id=user_id)
+        db_todo = TODO(
+            title=todo_data.title,
+            description=todo_data.description,
+            completed=todo_data.completed,
+            user_id=user_id,
+        )
         return create_todo_data(db_todo, db)
     except SQLAlchemyError as e:
         print(f"Database error when creating TODO item: {e}")
@@ -75,7 +91,9 @@ def create_todo_service(todo_data: TODOBase, db: Session, user_id: UUID) -> TODO
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-def full_update_todo_service(todo_id: UUID, todo_data: TODOBase, db: Session, user_id: UUID) -> TODO:
+def full_update_todo_service(
+    todo_id: UUID, todo_data: TODOBase, db: Session, user_id: UUID
+) -> TODO:
     """
     Update an existing TODO item.
 
@@ -102,7 +120,9 @@ def full_update_todo_service(todo_id: UUID, todo_data: TODOBase, db: Session, us
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-def partial_update_todo_service(todo_id: UUID, todo_data: TODOBase, db: Session, user_id: UUID) -> TODO:
+def partial_update_todo_service(
+    todo_id: UUID, todo_data: TODOBase, db: Session, user_id: UUID
+) -> TODO:
     """
     Partially update an existing TODO item.
 

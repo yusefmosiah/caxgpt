@@ -13,7 +13,13 @@ import os
 
 from ..models._user_auth import TokenData, RegisterUser
 from ..data._db_config import get_db
-from ..utils._helpers import verify_password, credentials_exception, create_refresh_token, validate_refresh_token, get_current_user_dep
+from ..utils._helpers import (
+    verify_password,
+    credentials_exception,
+    create_refresh_token,
+    validate_refresh_token,
+    get_current_user_dep,
+)
 from ..data._user_auth import get_user, db_signup_users, InvalidUserException
 
 _: bool = load_dotenv(find_dotenv())
@@ -22,10 +28,8 @@ _: bool = load_dotenv(find_dotenv())
 # openssl rand -hex 32
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = os.environ.get("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = os.environ.get(
-    "ACCESS_TOKEN_EXPIRE_MINUTES", "30")
-REFRESH_TOKEN_EXPIRE_MINUTES = os.environ.get(
-    "REFRESH_TOKEN_EXPIRE_MINUTES", "60")
+ACCESS_TOKEN_EXPIRE_MINUTES = os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
+REFRESH_TOKEN_EXPIRE_MINUTES = os.environ.get("REFRESH_TOKEN_EXPIRE_MINUTES", "60")
 
 if not SECRET_KEY:
     raise ValueError("No SECRET_KEY set for authentication")
@@ -70,8 +74,8 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     """
     to_encode = data.copy()
     # Convert UUID to string if it's present in the data
-    if 'id' in to_encode and isinstance(to_encode['id'], UUID):
-        to_encode['id'] = str(to_encode['id'])
+    if "id" in to_encode and isinstance(to_encode["id"], UUID):
+        to_encode["id"] = str(to_encode["id"])
 
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -92,7 +96,9 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
+):
     """
     Get the current authenticated user based on the provided token.
 
@@ -133,7 +139,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
 
 
 async def service_login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Session = Depends(get_db),
 ):
     """
     Authenticates the user and generates an access token.
@@ -152,22 +159,27 @@ async def service_login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(
-        minutes=float(ACCESS_TOKEN_EXPIRE_MINUTES))
+    access_token_expires = timedelta(minutes=float(ACCESS_TOKEN_EXPIRE_MINUTES))
     access_token = create_access_token(
         data={"sub": user.username, "id": user.id}, expires_delta=access_token_expires
     )
 
     # Generate refresh token (you might want to set a longer expiry for this)
     refresh_token_expires = timedelta(minutes=float(REFRESH_TOKEN_EXPIRE_MINUTES))
-    refresh_token = create_refresh_token(data={"sub": user.username, "id": user.id}, expires_delta=refresh_token_expires)
+    refresh_token = create_refresh_token(
+        data={"sub": user.username, "id": user.id}, expires_delta=refresh_token_expires
+    )
 
-    return {"access_token": access_token, "token_type": "bearer", "user": user, "expires_in": int(access_token_expires.total_seconds()), "refresh_token": refresh_token}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user,
+        "expires_in": int(access_token_expires.total_seconds()),
+        "refresh_token": refresh_token,
+    }
 
 
-async def service_signup_users(
-    user_data: RegisterUser, db: Session = Depends(get_db)
-):
+async def service_signup_users(user_data: RegisterUser, db: Session = Depends(get_db)):
     """
     Service function to sign up users.
 
@@ -191,7 +203,11 @@ async def service_signup_users(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def gpt_tokens_service(grant_type: str = Form(...), refresh_token: Optional[str] = Form(None), code: Optional[str] = Form(None)):
+async def gpt_tokens_service(
+    grant_type: str = Form(...),
+    refresh_token: Optional[str] = Form(None),
+    code: Optional[str] = Form(None),
+):
     """
     Generates access and refresh tokens based on the provided grant type.
 
@@ -226,15 +242,19 @@ async def gpt_tokens_service(grant_type: str = Form(...), refresh_token: Optiona
 
     # Generate access token
     access_token_expires = timedelta(minutes=float(ACCESS_TOKEN_EXPIRE_MINUTES))
-    access_token = create_access_token(data={"id": user_id}, expires_delta=access_token_expires)
+    access_token = create_access_token(
+        data={"id": user_id}, expires_delta=access_token_expires
+    )
 
     # Generate refresh token (you might want to set a longer expiry for this)
     refresh_token_expires = timedelta(minutes=float(REFRESH_TOKEN_EXPIRE_MINUTES))
-    rotated_refresh_token = create_refresh_token(data={"id": user_id}, expires_delta=refresh_token_expires)
+    rotated_refresh_token = create_refresh_token(
+        data={"id": user_id}, expires_delta=refresh_token_expires
+    )
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "expires_in": int(access_token_expires.total_seconds()),
-        "refresh_token": rotated_refresh_token  # Include refresh token in the response
+        "refresh_token": rotated_refresh_token,  # Include refresh token in the response
     }

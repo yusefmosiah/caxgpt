@@ -19,6 +19,7 @@ engine = create_engine(DB_URL, pool_pre_ping=True)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 # Dependency with retry mechanism for OperationalError
 def get_db():
     attempt_count = 0
