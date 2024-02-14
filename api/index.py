@@ -6,7 +6,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from uuid import UUID
 
-# Now you can use relative imports
+from .service.thoughtspace_service import ThoughtSpaceService
+from .models._message import MessagesResponse
+
 from .data._db_config import get_db
 from .models._user_auth import RegisterUser, UserOutput, LoginResonse, GPTToken
 from .service._user_auth import (
@@ -45,6 +47,8 @@ app = FastAPI(
     ],
     docs_url="/api/docs",
 )
+
+service = ThoughtSpaceService(db=Depends(get_db))
 
 
 # user_auth.py web layer routes
@@ -304,3 +308,12 @@ def delete_todo(
 @app.get("/hello")
 def hello_world():
     return {"message": "Hello World"}
+
+
+@app.post("/api/new_message", response_model=MessagesResponse)
+async def new_message_endpoint(input_text: str):
+    try:
+        response = await service.new_message(input_text)
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

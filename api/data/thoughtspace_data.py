@@ -20,9 +20,9 @@ class MessageDeletionException(Exception):
 
 
 class ThoughtSpaceData:
-    def __init__(self, qdrant_client: QdrantClient, openai_client: OpenAIClient, db: Session):
-        self.qdrant_client = qdrant_client
-        self.openai_client = openai_client
+    def __init__(self, db: Session):
+        self.qdrant_client = QdrantClient()
+        self.openai_client = OpenAIClient()
         self.db = db
 
     async def embed_text(self, input_text: str) -> Optional[List[float]]:
@@ -49,35 +49,35 @@ class ThoughtSpaceData:
         """
         Upserts a message into the Qdrant collection.
         """
-        return await self.qdrant_client.upsert(id, input_string, embedding)
+        await self.qdrant_client.upsert(id, input_string, embedding)
 
-    async def create_message(self, user_id: str, message_id: str):
+    def create_message(self, user_id: str, message_id: str):
         try:
             new_message = MESSAGE(user_id=user_id, id=message_id)
             self.db.add(new_message)
-            await self.db.commit()
+            self.db.commit()
         except Exception as e:
             raise MessageCreationException(f"Failed to create message: {e}")
 
-    async def get_message(self, message_id: str):
-        message = await self.db.query(MESSAGE).filter(MESSAGE.id == message_id).first()
+    def get_message(self, message_id: str):
+        message = self.db.query(MESSAGE).filter(MESSAGE.id == message_id).first()
         if not message:
             raise MessageNotFoundException(f"Message with ID {message_id} not found")
         return message
 
-    async def get_messages_by_user_id(self, user_id: str):
+    def get_messages_by_user_id(self, user_id: str):
         try:
-            return await self.db.query(MESSAGE).filter(MESSAGE.user_id == user_id).all()
+            return self.db.query(MESSAGE).filter(MESSAGE.user_id == user_id).all()
         except Exception as e:
             raise Exception(f"Failed to retrieve messages for user {user_id}: {e}")
 
-    async def delete_message(self, message_id: str):
+    def delete_message(self, message_id: str):
         try:
-            message_to_delete = await self.db.query(MESSAGE).filter(MESSAGE.id == message_id).first()
+            message_to_delete = self.db.query(MESSAGE).filter(MESSAGE.id == message_id).first()
             if not message_to_delete:
                 raise MessageNotFoundException(f"Message with ID {message_id} not found")
-            await self.db.delete(message_to_delete)
-            await self.db.commit()
+            self.db.delete(message_to_delete)
+            self.db.commit()
         except MessageNotFoundException as e:
             raise e
         except Exception as e:
