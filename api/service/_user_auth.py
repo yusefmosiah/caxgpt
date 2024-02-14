@@ -97,9 +97,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
-):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     """
     Get the current authenticated user based on the provided token.
 
@@ -161,9 +159,7 @@ async def service_login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=float(ACCESS_TOKEN_EXPIRE_MINUTES))
-    access_token = create_access_token(
-        data={"sub": user.username, "id": user.id}, expires_delta=access_token_expires
-    )
+    access_token = create_access_token(data={"sub": user.username, "id": user.id}, expires_delta=access_token_expires)
 
     # Generate refresh token (you might want to set a longer expiry for this)
     refresh_token_expires = timedelta(minutes=float(REFRESH_TOKEN_EXPIRE_MINUTES))
@@ -243,15 +239,11 @@ async def gpt_tokens_service(
 
     # Generate access token
     access_token_expires = timedelta(minutes=float(ACCESS_TOKEN_EXPIRE_MINUTES))
-    access_token = create_access_token(
-        data={"id": user_id}, expires_delta=access_token_expires
-    )
+    access_token = create_access_token(data={"id": user_id}, expires_delta=access_token_expires)
 
     # Generate refresh token (you might want to set a longer expiry for this)
     refresh_token_expires = timedelta(minutes=float(REFRESH_TOKEN_EXPIRE_MINUTES))
-    rotated_refresh_token = create_refresh_token(
-        data={"id": user_id}, expires_delta=refresh_token_expires
-    )
+    rotated_refresh_token = create_refresh_token(data={"id": user_id}, expires_delta=refresh_token_expires)
 
     return {
         "access_token": access_token,

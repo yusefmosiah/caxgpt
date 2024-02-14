@@ -5,13 +5,7 @@ import uuid
 
 
 class ThoughtSpace:
-    def __init__(
-        self,
-        collection_name="choir",
-        openai_api_key=None,
-        qdrant_url=None,
-        qdrant_api_key=None,
-    ):
+    def __init__(self, collection_name="choir", openai_api_key=None, qdrant_url=None, qdrant_api_key=None):
         # Use provided API keys or source from environment
         self.openai_api_key = openai_api_key if openai_api_key else os.environ.get("OPENAI_API_KEY")
         self.qdrant_url = qdrant_url if qdrant_url else os.environ.get("QDRANT_URL")
@@ -58,13 +52,7 @@ class ThoughtSpace:
         """
         await self.qdrant_client.set_payload(collection_name=self.collection_name, payload=payload, points=points)
 
-    async def process_query(
-        self,
-        query,
-        model_name="text-embedding-ada-002",
-        search_limit=200,
-        with_vectors=False,
-    ):
+    async def process_query(self, query, model_name="text-embedding-ada-002", search_limit=200, with_vectors=False):
         embedding = await self.embed(query, model_name)
         search_results = await self.search(embedding, search_limit, with_vectors)
         deduplicated_results = self.deduplicate(search_results)
