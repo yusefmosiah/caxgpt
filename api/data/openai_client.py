@@ -1,6 +1,7 @@
 import os
 from openai import AsyncOpenAI, OpenAIError
 
+
 class OpenAIClient:
     def __init__(self, openai_api_key=None):
         self.openai_api_key = openai_api_key if openai_api_key else os.environ.get("OPENAI_API_KEY")

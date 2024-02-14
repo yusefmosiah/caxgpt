@@ -3,6 +3,7 @@ import logging
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.http.exceptions import ApiException, UnexpectedResponse
 
+
 class QdrantClient:
     def __init__(self, collection_name="choir", qdrant_url=None, qdrant_api_key=None):
         self.qdrant_url = qdrant_url if qdrant_url else os.environ.get("QDRANT_URL")
