@@ -41,6 +41,7 @@ class ThoughtSpaceService:
         unique_messages = list(unique_messages_dict.values())
         print(f"unique count: {len(unique_messages)}")
         return unique_messages
+
     # Additional methods for curating messages, etc., can be added here
 
     def dedup(self, messages: List[Message]) -> List[Message]:
@@ -63,6 +64,14 @@ class ThoughtSpaceService:
         print(f"unique count: {len(deduplicated_messages)}")
         print(f"uniques: {deduplicated_messages}")
         return deduplicated_messages
+
+    def rerank(self, messages):
+        return sorted(
+            messages,
+            key=lambda msg: (msg.similarity_score * (msg.voice or 1) * (msg.curations_count or 1))
+            / (datetime.now() - msg.created_at).total_seconds(),
+            reverse=True,
+        )
 
     def scored_point_to_message(self, scored_point: ScoredPoint) -> Message:
         message_id = scored_point.id
@@ -98,8 +107,8 @@ class ThoughtSpaceService:
         messages = [self.scored_point_to_message(result) for result in search_results]
         await self.thoughtspace_data.upsert_message(str(uuid.uuid4()), input_text, embedding)
         print("before dedup")
-        deduped = self.dedup(messages=messages)
-        return MessagesResponse(messages=deduped)
+        relevant_messages = self.rerank(self.dedup(messages))
+        return MessagesResponse(messages=relevant_messages)
 
     # async def quote_messages(self, id_voice_pairs: dict) -> None:
     #     """

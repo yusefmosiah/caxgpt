@@ -313,7 +313,7 @@ async def signup_users(user_data: RegisterUser, db: Session = Depends(get_db)):
 @app.post("/api/new_message")
 async def new_message_endpoint(
     request: NewMessageRequest,
-    user: UserOutput = Depends(get_current_user_dep)
+    # user: UserOutput = Depends(get_current_user_dep)
 ):
     """
     Send a new message for authenticated users.
