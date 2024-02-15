@@ -20,6 +20,7 @@ class Message(BaseModel):
     similarity_score: float
     voice: Optional[int] = None  # Change default to None
     curations_count: Optional[int] = None  # Replace curations list with count, default to None
+    created_at: datetime = Field(default_factory=datetime.now)
 
     @validator("voice", pre=True, always=True)
     def convert_voice_to_int(cls, v):

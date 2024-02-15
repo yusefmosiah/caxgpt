@@ -40,6 +40,12 @@ class ThoughtSpaceService:
         similarity_score = scored_point.score  # Assuming ScoredPoint has a 'score' attribute
         voice = scored_point.payload.get("voice", 0)
         curations_payload = scored_point.payload.get("curations", [])
+        created_at_str = scored_point.payload.get(
+            "created_at", datetime.now().isoformat()
+        )  # Default to now if not present
+
+        # Convert the creation timestamp string to a datetime object
+        created_at = datetime.fromisoformat(created_at_str)
 
         # Only include voice if it's not 0
         voice = voice if voice != 0 else None
@@ -53,6 +59,7 @@ class ThoughtSpaceService:
             similarity_score=similarity_score,
             voice=voice,
             curations_count=curations_count,
+            created_at=created_at,
         )
 
     async def new_message(self, input_text: str) -> MessagesResponse:
