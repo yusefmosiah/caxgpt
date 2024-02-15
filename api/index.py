@@ -329,6 +329,6 @@ async def new_message_endpoint(
         # Assuming `service.new_message` now also requires user information, you can pass it if needed
         # For example: response = await service.new_message(request.input_text, user_id=user.id)
         response = await service.new_message(request.input_text)
-        return response.dict(exclude_none=True)
+        return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

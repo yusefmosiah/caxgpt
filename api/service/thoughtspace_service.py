@@ -4,6 +4,7 @@ from ..models._message import Message, Curation, MessagesResponse
 from datetime import datetime
 from qdrant_client.http.models import ScoredPoint
 from sqlalchemy.orm import Session
+import math
 import uuid
 
 
@@ -66,12 +67,15 @@ class ThoughtSpaceService:
         return deduplicated_messages
 
     def rerank(self, messages):
-        return sorted(
-            messages,
-            key=lambda msg: (msg.similarity_score * (msg.voice or 1) * (msg.curations_count or 1))
-            / (datetime.now() - msg.created_at).total_seconds(),
-            reverse=True,
-        )
+        now = datetime.now()
+        for msg in messages:
+            # Check if msg.voice is None and default to 1 before applying sqrt
+            voice_value = 1 if msg.voice is None else msg.voice**0.1
+            # Use voice_value in the calculation, which will be 1 if msg.voice was None
+            msg.reranking_score = ((100 * msg.similarity_score * voice_value) ** (msg.curations_count or 1.0)) / (
+                now - msg.created_at
+            ).total_seconds()
+        return sorted(messages, key=lambda msg: msg.reranking_score, reverse=True)
 
     def scored_point_to_message(self, scored_point: ScoredPoint) -> Message:
         message_id = scored_point.id
@@ -101,14 +105,29 @@ class ThoughtSpaceService:
             created_at=created_at,
         )
 
-    async def new_message(self, input_text: str) -> MessagesResponse:
+    # Method to convert Message object to a sparsified dictionary
+    def message_to_sparse_dict(self, message):
+        fields = {
+            "id": str(message.id),
+            "content": message.content,
+            "reranking": message.reranking_score,
+            "similarity": message.similarity_score,
+            "voice": message.voice,
+            "curations_count": message.curations_count,
+            # make sense of curation later
+        }
+
+        return {k: v for k, v in fields.items() if v is not None}
+
+    async def new_message(self, input_text: str):
         embedding = await self.thoughtspace_data.embed_text(input_text)
         search_results = await self.thoughtspace_data.search_similar_messages(embedding)
         messages = [self.scored_point_to_message(result) for result in search_results]
         await self.thoughtspace_data.upsert_message(str(uuid.uuid4()), input_text, embedding)
         print("before dedup")
         relevant_messages = self.rerank(self.dedup(messages))
-        return MessagesResponse(messages=relevant_messages)
+        sparse_messages = [self.message_to_sparse_dict(msg) for msg in relevant_messages]
+        return {"messages": sparse_messages}
 
     # async def quote_messages(self, id_voice_pairs: dict) -> None:
     #     """

@@ -18,6 +18,7 @@ class Message(BaseModel):
     id: UUID
     content: str
     similarity_score: float
+    reranking_score: Optional[float] = None
     voice: Optional[int] = None  # Change default to None
     curations_count: Optional[int] = None  # Replace curations list with count, default to None
     created_at: datetime = Field(default_factory=datetime.now)
