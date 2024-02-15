@@ -1,5 +1,5 @@
 from sqlalchemy.orm import mapped_column, DeclarativeBase, Mapped, relationship
-from sqlalchemy import String, Boolean, UUID, DateTime, Text, ForeignKey
+from sqlalchemy import String, Boolean, UUID, DateTime, Text, ForeignKey, Integer
 
 import datetime
 import uuid
@@ -54,6 +54,7 @@ class USER(Base):
     full_name: Mapped[str] = mapped_column(String)
     hashed_password: Mapped[str] = mapped_column(String, index=True)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    voice: Mapped[int] = mapped_column(Integer, default=0)
 
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc)

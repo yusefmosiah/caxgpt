@@ -1,5 +1,6 @@
 import uuid
 import logging
+import math
 from typing import List, Optional
 from ._sqlalchemy_models import MESSAGE
 from .qdrant_client import QdrantClient
@@ -88,3 +89,14 @@ class ThoughtSpaceData:
         except Exception as e:
             logger.error(f"Failed to delete message: {e}")
             raise MessageDeletionException(f"Failed to delete message: {e}")
+
+    def update_user_voice_balance(self, user_id: str, voice_amount: float):
+        user = self.db.query(USER).filter(USER.id == user_id).first()
+        if user:
+            # Calculate the floor of the voice_amount and add it to the user's voice score
+            voice_to_add = math.floor(voice_amount * 100)
+            user.voice += voice_to_add
+            self.db.commit()
+            logger.info(f"Added {voice_to_add} VOICE to user {user_id}'s balance.")
+        else:
+            logger.error(f"User with ID {user_id} not found")

@@ -114,20 +114,29 @@ class ThoughtSpaceService:
             "similarity": message.similarity_score,
             "voice": message.voice,
             "curations_count": message.curations_count,
-            # make sense of curation later
+            "novelty": (1 - message.similarity_score) * message.reranking_score,
         }
 
         return {k: v for k, v in fields.items() if v is not None}
 
-    async def new_message(self, input_text: str):
+    def calculate_novelty(self, search_results):
+        print(f"novelty {search_results[:10]}")
+        novelty_scores = [1 - result.score for result in search_results]
+        return novelty_scores
+
+    async def new_message(self, input_text: str, user_id: str):
         embedding = await self.thoughtspace_data.embed_text(input_text)
         search_results = await self.thoughtspace_data.search_similar_messages(embedding)
         messages = [self.scored_point_to_message(result) for result in search_results]
         await self.thoughtspace_data.upsert_message(str(uuid.uuid4()), input_text, embedding)
-        print("before dedup")
+        # Deduplicate and rerank messages
         relevant_messages = self.rerank(self.dedup(messages))
+        # Convert messages to sparse format
         sparse_messages = [self.message_to_sparse_dict(msg) for msg in relevant_messages]
-        return {"messages": sparse_messages}
+        # Calculate total novelty score
+        total_novelty = sum(1 - msg.similarity_score for msg in relevant_messages)
+        self.thoughtspace_data.update_user_voice_balance(user_id, total_novelty)
+        return {"novelty": total_novelty, "messages": sparse_messages}
 
     # async def quote_messages(self, id_voice_pairs: dict) -> None:
     #     """
