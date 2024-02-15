@@ -310,9 +310,10 @@ async def signup_users(user_data: RegisterUser, db: Session = Depends(get_db)):
 #     return {"message": "Hello World"}
 
 
-@app.post("/api/new_message", response_model=MessagesResponse)
+@app.post("/api/new_message")
 async def new_message_endpoint(
-    request: NewMessageRequest, user: UserOutput = Depends(get_current_user_dep)  # Use the dependency here
+    request: NewMessageRequest,
+    # user: UserOutput = Depends(get_current_user_dep)
 ):
     """
     Send a new message for authenticated users.
@@ -328,6 +329,6 @@ async def new_message_endpoint(
         # Assuming `service.new_message` now also requires user information, you can pass it if needed
         # For example: response = await service.new_message(request.input_text, user_id=user.id)
         response = await service.new_message(request.input_text)
-        return response
+        return response.dict(exclude_none=True)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

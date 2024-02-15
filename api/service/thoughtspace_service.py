@@ -35,37 +35,24 @@ class ThoughtSpaceService:
     # Additional methods for curating messages, etc., can be added here
 
     def scored_point_to_message(self, scored_point: ScoredPoint) -> Message:
-        """
-        Converts a single ScoredPoint from Qdrant search results into a Message model, including curations.
-        Extracts the 'created_at' timestamp from the payload and uses it for both 'created_at' and 'updated_at' fields.
-        """
         message_id = scored_point.id
         content = scored_point.payload.get("content", "")
+        similarity_score = scored_point.score  # Assuming ScoredPoint has a 'score' attribute
         voice = scored_point.payload.get("voice", 0)
         curations_payload = scored_point.payload.get("curations", [])
-        created_at_str = scored_point.payload.get(
-            "created_at", datetime.now().isoformat()
-        )  # Default to now if not present
 
-        # Convert the creation timestamp string to a datetime object
-        created_at = datetime.fromisoformat(created_at_str)
+        # Only include voice if it's not 0
+        voice = voice if voice != 0 else None
 
-        # Process curations if available
-        curations = []
-        for curation_data in curations_payload:
-            try:
-                curation = Curation(**curation_data)
-                curations.append(curation)
-            except TypeError:
-                # If curation_data does not match the Curation model, skip it
-                continue
+        # Replace list of curations with count, only include if count is not 0
+        curations_count = len(curations_payload) if curations_payload else None
 
         return Message(
             id=message_id,
             content=content,
+            similarity_score=similarity_score,
             voice=voice,
-            curations=curations,
-            created_at=created_at,
+            curations_count=curations_count,
         )
 
     async def new_message(self, input_text: str) -> MessagesResponse:
@@ -73,7 +60,6 @@ class ThoughtSpaceService:
         search_results = await self.thoughtspace_data.search_similar_messages(embedding)
         messages = [self.scored_point_to_message(result) for result in search_results]
         await self.thoughtspace_data.upsert_message(str(uuid.uuid4()), input_text, embedding)
-        print("before return")
         return MessagesResponse(messages=messages)
 
     # async def quote_messages(self, id_voice_pairs: dict) -> None:
