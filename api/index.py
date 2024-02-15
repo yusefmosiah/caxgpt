@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from uuid import UUID
 
 from .service.thoughtspace_service import ThoughtSpaceService
-from .models._message import MessagesResponse
+from .models._message import MessagesResponse, NewMessageRequest
 
 from .data._db_config import get_db
 from .models._user_auth import RegisterUser, UserOutput, LoginResonse, GPTToken
@@ -311,9 +311,25 @@ def hello_world():
 
 
 @app.post("/api/new_message", response_model=MessagesResponse)
-async def new_message_endpoint(input_text: str):
+async def new_message_endpoint(
+    request: NewMessageRequest, user: UserOutput = Depends(get_current_user_dep)  # Use the dependency here
+):
+    """
+    Send a new message. This endpoint is accessible only to logged-in users.
+
+    Args:
+        request (NewMessageRequest): The request model containing the message data.
+        user (UserOutput): The user object obtained from the authentication dependency.
+                           This parameter is not directly used in the function but is required
+                           to ensure the user is authenticated.
+
+    Returns:
+        MessagesResponse: The response model containing the result of the message sending operation.
+    """
     try:
-        response = await service.new_message(input_text)
+        # Assuming `service.new_message` now also requires user information, you can pass it if needed
+        # For example: response = await service.new_message(request.input_text, user_id=user.id)
+        response = await service.new_message(request.input_text)
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

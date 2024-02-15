@@ -1,6 +1,6 @@
 import os
 import logging
-from qdrant_client import AsyncQdrantClient
+from qdrant_client import AsyncQdrantClient, models
 from qdrant_client.http.exceptions import ApiException, UnexpectedResponse
 
 

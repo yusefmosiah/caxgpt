@@ -1,8 +1,10 @@
 from typing import List
 from ..data.thoughtspace_data import ThoughtSpaceData
-from ..models._message import Message, MessagesResponse
+from ..models._message import Message, Curation, MessagesResponse
 from datetime import datetime
 from qdrant_client.http.models import ScoredPoint
+from sqlalchemy.orm import Session
+import uuid
 
 
 class ThoughtSpaceService:
@@ -71,6 +73,7 @@ class ThoughtSpaceService:
         search_results = await self.thoughtspace_data.search_similar_messages(embedding)
         messages = [self.scored_point_to_message(result) for result in search_results]
         await self.thoughtspace_data.upsert_message(str(uuid.uuid4()), input_text, embedding)
+        print("before return")
         return MessagesResponse(messages=messages)
 
     # async def quote_messages(self, id_voice_pairs: dict) -> None:
