@@ -313,7 +313,7 @@ async def signup_users(user_data: RegisterUser, db: Session = Depends(get_db)):
 @app.post("/api/new_message")
 async def new_message_endpoint(
     request: NewMessageRequest,
-    user: UserOutput = Depends(get_current_user_dep)
+    user_id: UUID = Depends(get_current_user_dep),
 ):
     """
     Send a new message for authenticated users.
@@ -328,7 +328,7 @@ async def new_message_endpoint(
     try:
         # Assuming `service.new_message` now also requires user information, you can pass it if needed
         # For example: response = await service.new_message(request.input_text, user_id=user.id)
-        response = await service.new_message(request.input_text)
+        response = await service.new_message(request.input_text, user_id)
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
