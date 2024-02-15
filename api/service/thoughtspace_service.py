@@ -23,16 +23,46 @@ class ThoughtSpaceService:
         return MessagesResponse(messages=messages)
 
     async def deduplicate_messages(self, messages: List[Message]) -> List[Message]:
-        """
-        Deduplicates a list of messages based on content, choosing the one with the earliest created_at timestamp in case of duplicates.
-        """
+        print("start dedup")
+        print(len(messages))
+        # Normalize content by stripping whitespace and converting to lowercase
+        normalized_content = lambda message: message.content.strip().lower()
         # Sort messages by created_at timestamp to ensure earlier messages are prioritized
         messages.sort(key=lambda message: message.created_at)
-        # Use an ordered dictionary to deduplicate, preserving the order and prioritizing earlier messages
-        unique_messages = list({message.content: message for message in messages}.values())
-        return unique_messages
+        print("sorted messages")
+        print(messages[:10])
 
+        unique_messages_dict = {}
+        for message in messages:
+            content_key = normalized_content(message)
+            if content_key not in unique_messages_dict:
+                unique_messages_dict[content_key] = message
+
+        unique_messages = list(unique_messages_dict.values())
+        print(f"unique count: {len(unique_messages)}")
+        return unique_messages
     # Additional methods for curating messages, etc., can be added here
+
+    def dedup(self, messages: List[Message]) -> List[Message]:
+        print("start dedup")
+        print(len(messages))
+        # Normalize content by stripping whitespace and converting to lowercase
+        normalized_content = lambda message: message.content.strip().lower()
+
+        # Sort messages by created_at timestamp to ensure earlier messages are prioritized
+        messages.sort(key=lambda message: message.created_at)
+        print("sorted messages")
+
+        unique_contents = set()
+        deduplicated_messages = []
+        for message in messages:
+            content_key = normalized_content(message)
+            if content_key not in unique_contents:
+                unique_contents.add(content_key)
+                deduplicated_messages.append(message)
+        print(f"unique count: {len(deduplicated_messages)}")
+        print(f"uniques: {deduplicated_messages}")
+        return deduplicated_messages
 
     def scored_point_to_message(self, scored_point: ScoredPoint) -> Message:
         message_id = scored_point.id
@@ -67,7 +97,9 @@ class ThoughtSpaceService:
         search_results = await self.thoughtspace_data.search_similar_messages(embedding)
         messages = [self.scored_point_to_message(result) for result in search_results]
         await self.thoughtspace_data.upsert_message(str(uuid.uuid4()), input_text, embedding)
-        return MessagesResponse(messages=messages)
+        print("before dedup")
+        deduped = self.dedup(messages=messages)
+        return MessagesResponse(messages=deduped)
 
     # async def quote_messages(self, id_voice_pairs: dict) -> None:
     #     """
