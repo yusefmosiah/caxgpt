@@ -124,190 +124,190 @@ async def signup_users(user_data: RegisterUser, db: Session = Depends(get_db)):
     return await service_signup_users(user_data, db)
 
 
-#  todos_crud.py web layer routes
+# #  todos_crud.py web layer routes
 
 
-# Get ALL TODOS
-@app.get("/api/todos", response_model=PaginatedTodos, tags=["TODO Crud"])
-def get_todos(
-    db: Session = Depends(get_db),
-    user_id: UUID = Depends(get_current_user_dep),
-    page: int = Query(1, description="Page number", ge=1),
-    per_page: int = Query(10, description="Items per page", ge=1, le=100),
-):
-    """
-    Get ALL TODOS
+# # Get ALL TODOS
+# @app.get("/api/todos", response_model=PaginatedTodos, tags=["TODO Crud"])
+# def get_todos(
+#     db: Session = Depends(get_db),
+#     user_id: UUID = Depends(get_current_user_dep),
+#     page: int = Query(1, description="Page number", ge=1),
+#     per_page: int = Query(10, description="Items per page", ge=1, le=100),
+# ):
+#     """
+#     Get ALL TODOS
 
-    Args:
-        db (Session, optional):  Dependency Injection
-        user_id (UUID, optional):  Dependency Injection
-        page (int, optional): Page number. Defaults to Query(1).
-        per_page (int, optional): Items per page. Defaults to Query(10).
+#     Args:
+#         db (Session, optional):  Dependency Injection
+#         user_id (UUID, optional):  Dependency Injection
+#         page (int, optional): Page number. Defaults to Query(1).
+#         per_page (int, optional): Items per page. Defaults to Query(10).
 
-    Returns:
+#     Returns:
 
-        PaginatedTodos: Paginated Todos
-    """
-    try:
-        # Calculate the offset to skip the appropriate number of items
-        offset = (page - 1) * per_page
-        all_todos = get_all_todos_service(db, user_id, offset, per_page)
+#         PaginatedTodos: Paginated Todos
+#     """
+#     try:
+#         # Calculate the offset to skip the appropriate number of items
+#         offset = (page - 1) * per_page
+#         all_todos = get_all_todos_service(db, user_id, offset, per_page)
 
-        # Calculate next and previous page URLs
-        next_page = f"?page={page + 1}&per_page={per_page}" if len(all_todos) == per_page else None
-        previous_page = f"?page={page - 1}&per_page={per_page}" if page > 1 else None
+#         # Calculate next and previous page URLs
+#         next_page = f"?page={page + 1}&per_page={per_page}" if len(all_todos) == per_page else None
+#         previous_page = f"?page={page - 1}&per_page={per_page}" if page > 1 else None
 
-        # Return data in paginated format
-        paginated_data = {
-            "count": len(all_todos),
-            "next": next_page,
-            "previous": previous_page,
-            "todos": all_todos,
-        }
+#         # Return data in paginated format
+#         paginated_data = {
+#             "count": len(all_todos),
+#             "next": next_page,
+#             "previous": previous_page,
+#             "todos": all_todos,
+#         }
 
-        return paginated_data
-        # return get_all_todos_service(db, user_id)
-    except Exception as e:
-        # Handle specific exceptions with different HTTP status codes if needed
-        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
-
-
-# Get a Single TODO item
-@app.get("/api/todos/{todo_id}", response_model=TODOResponse, tags=["TODO Crud"])
-def get_todo_by_id(
-    todo_id: UUID,
-    db: Session = Depends(get_db),
-    user_id: UUID = Depends(get_current_user_dep),
-):
-    """
-    Get a Single TODO item
-
-    Args:
-        todo_id (UUID): TODO ID
-        db (Session, optional):  Dependency Injection
-        user_id (UUID, optional):  Dependency Injection
-
-    Returns:
-        TODOResponse: TODO Response
-
-    """
-    try:
-        return get_todo_by_id_service(todo_id, db, user_id)
-    except HTTPException as e:
-        # If the service layer raised an HTTPException, re-raise it
-        raise e
-    except Exception as e:
-        # Handle specific exceptions with different HTTP status codes if needed
-        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+#         return paginated_data
+#         # return get_all_todos_service(db, user_id)
+#     except Exception as e:
+#         # Handle specific exceptions with different HTTP status codes if needed
+#         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
 
-# Create a new TODO item
-@app.post("/api/todos", response_model=TODOResponse, tags=["TODO Crud"], status_code=201)
-def create_todo(
-    todo: TODOBase,
-    db: Session = Depends(get_db),
-    user_id: UUID = Depends(get_current_user_dep),
-):
-    """
-    Create a new TODO item
+# # Get a Single TODO item
+# @app.get("/api/todos/{todo_id}", response_model=TODOResponse, tags=["TODO Crud"])
+# def get_todo_by_id(
+#     todo_id: UUID,
+#     db: Session = Depends(get_db),
+#     user_id: UUID = Depends(get_current_user_dep),
+# ):
+#     """
+#     Get a Single TODO item
 
-    Args:
-        todo (TODOBase): TODO Data
-        db (Session, optional):  Dependency Injection
-        user_id (UUID, optional):  Dependency Injection
+#     Args:
+#         todo_id (UUID): TODO ID
+#         db (Session, optional):  Dependency Injection
+#         user_id (UUID, optional):  Dependency Injection
 
-    Returns:
-        TODOResponse: TODO Response
-    """
-    try:
-        return create_todo_service(todo, db, user_id)
-    except Exception as e:
-        # Handle specific exceptions with different HTTP status codes if needed
-        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+#     Returns:
+#         TODOResponse: TODO Response
 
-
-# Update a Single TODO item Completly
-@app.put("/api/todos/{todo_id}", response_model=TODOResponse, tags=["TODO Crud"])
-def update_todo(
-    todo_id: UUID,
-    updated_todo: TODOBase,
-    db: Session = Depends(get_db),
-    user_id: UUID = Depends(get_current_user_dep),
-):
-    """
-    Update a Single TODO item Completly
-
-    Args:
-        todo_id (UUID): TODO ID
-        updated_todo (TODOBase): Updated TODO Data
-        db (Session, optional):  Dependency Injection
-        user_id (UUID, optional):  Dependency Injection
-
-    Returns:
-        TODOResponse: TODO Response
-    """
-    try:
-        return full_update_todo_service(todo_id, updated_todo, db, user_id)
-    except Exception as e:
-        # Handle specific exceptions with different HTTP status codes if needed
-        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+#     """
+#     try:
+#         return get_todo_by_id_service(todo_id, db, user_id)
+#     except HTTPException as e:
+#         # If the service layer raised an HTTPException, re-raise it
+#         raise e
+#     except Exception as e:
+#         # Handle specific exceptions with different HTTP status codes if needed
+#         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
 
-# Update a Single TODO item partially
-@app.patch("/api/todos/{todo_id}", response_model=TODOResponse, tags=["TODO Crud"])
-def update_todo_partial(
-    todo_id: UUID,
-    updated_todo: TODOBase,
-    db: Session = Depends(get_db),
-    user_id: UUID = Depends(get_current_user_dep),
-):
-    """
-    Partially Update a Single TODO item
+# # Create a new TODO item
+# @app.post("/api/todos", response_model=TODOResponse, tags=["TODO Crud"], status_code=201)
+# def create_todo(
+#     todo: TODOBase,
+#     db: Session = Depends(get_db),
+#     user_id: UUID = Depends(get_current_user_dep),
+# ):
+#     """
+#     Create a new TODO item
 
-    Args:
-        todo_id (UUID): TODO ID
-        updated_todo (TODOBase): Updated TODO Data
-        db (Session, optional): Dependency Injection
-        user_id (UUID, optional):  Dependency Injection
+#     Args:
+#         todo (TODOBase): TODO Data
+#         db (Session, optional):  Dependency Injection
+#         user_id (UUID, optional):  Dependency Injection
 
-    Returns:
-        TODOResponse: TODO Response
-    """
-    try:
-        return partial_update_todo_service(todo_id, updated_todo, db, user_id)
-    except Exception as e:
-        # Handle specific exceptions with different HTTP status codes if needed
-        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+#     Returns:
+#         TODOResponse: TODO Response
+#     """
+#     try:
+#         return create_todo_service(todo, db, user_id)
+#     except Exception as e:
+#         # Handle specific exceptions with different HTTP status codes if needed
+#         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
 
-# DELETE a single TODO item
-@app.delete("/api/todos/{todo_id}", tags=["TODO Crud"])
-def delete_todo(
-    todo_id: UUID,
-    db: Session = Depends(get_db),
-    user_id: UUID = Depends(get_current_user_dep),
-):
-    """
-    Delete a Single TODO item
+# # Update a Single TODO item Completly
+# @app.put("/api/todos/{todo_id}", response_model=TODOResponse, tags=["TODO Crud"])
+# def update_todo(
+#     todo_id: UUID,
+#     updated_todo: TODOBase,
+#     db: Session = Depends(get_db),
+#     user_id: UUID = Depends(get_current_user_dep),
+# ):
+#     """
+#     Update a Single TODO item Completly
 
-    Args:
-        todo_id (UUID): TODO ID
-        db (Session, optional):  Dependency Injection
-        user_id (UUID, optional):  Dependency Injection
+#     Args:
+#         todo_id (UUID): TODO ID
+#         updated_todo (TODOBase): Updated TODO Data
+#         db (Session, optional):  Dependency Injection
+#         user_id (UUID, optional):  Dependency Injection
 
-    Returns:
-        null
-    """
-    try:
-        return delete_todo_data(todo_id, db, user_id)
-    except Exception as e:
-        # Handle specific exceptions with different HTTP status codes if needed
-        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+#     Returns:
+#         TODOResponse: TODO Response
+#     """
+#     try:
+#         return full_update_todo_service(todo_id, updated_todo, db, user_id)
+#     except Exception as e:
+#         # Handle specific exceptions with different HTTP status codes if needed
+#         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
 
-@app.get("/hello")
-def hello_world():
-    return {"message": "Hello World"}
+# # Update a Single TODO item partially
+# @app.patch("/api/todos/{todo_id}", response_model=TODOResponse, tags=["TODO Crud"])
+# def update_todo_partial(
+#     todo_id: UUID,
+#     updated_todo: TODOBase,
+#     db: Session = Depends(get_db),
+#     user_id: UUID = Depends(get_current_user_dep),
+# ):
+#     """
+#     Partially Update a Single TODO item
+
+#     Args:
+#         todo_id (UUID): TODO ID
+#         updated_todo (TODOBase): Updated TODO Data
+#         db (Session, optional): Dependency Injection
+#         user_id (UUID, optional):  Dependency Injection
+
+#     Returns:
+#         TODOResponse: TODO Response
+#     """
+#     try:
+#         return partial_update_todo_service(todo_id, updated_todo, db, user_id)
+#     except Exception as e:
+#         # Handle specific exceptions with different HTTP status codes if needed
+#         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
+
+# # DELETE a single TODO item
+# @app.delete("/api/todos/{todo_id}", tags=["TODO Crud"])
+# def delete_todo(
+#     todo_id: UUID,
+#     db: Session = Depends(get_db),
+#     user_id: UUID = Depends(get_current_user_dep),
+# ):
+#     """
+#     Delete a Single TODO item
+
+#     Args:
+#         todo_id (UUID): TODO ID
+#         db (Session, optional):  Dependency Injection
+#         user_id (UUID, optional):  Dependency Injection
+
+#     Returns:
+#         null
+#     """
+#     try:
+#         return delete_todo_data(todo_id, db, user_id)
+#     except Exception as e:
+#         # Handle specific exceptions with different HTTP status codes if needed
+#         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
+
+# @app.get("/hello")
+# def hello_world():
+#     return {"message": "Hello World"}
 
 
 @app.post("/api/new_message", response_model=MessagesResponse)
@@ -315,16 +315,14 @@ async def new_message_endpoint(
     request: NewMessageRequest, user: UserOutput = Depends(get_current_user_dep)  # Use the dependency here
 ):
     """
-    Send a new message. This endpoint is accessible only to logged-in users.
+    Send a new message for authenticated users.
 
     Args:
-        request (NewMessageRequest): The request model containing the message data.
-        user (UserOutput): The user object obtained from the authentication dependency.
-                           This parameter is not directly used in the function but is required
-                           to ensure the user is authenticated.
+        request: Contains message data.
+        user: Ensures user is authenticated.
 
     Returns:
-        MessagesResponse: The response model containing the result of the message sending operation.
+        MessagesResponse: Result of sending the message.
     """
     try:
         # Assuming `service.new_message` now also requires user information, you can pass it if needed
