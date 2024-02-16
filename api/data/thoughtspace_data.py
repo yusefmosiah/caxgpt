@@ -106,7 +106,7 @@ class ThoughtSpaceData:
         print(f"user: {user}")
         if user:
             # Calculate the floor of the voice_amount and add it to the user's voice score
-            voice_to_add = math.floor(voice_amount * 100)
+            voice_to_add = math.floor(voice_amount)
             user.voice += voice_to_add
             self.db.commit()
             logger.info(f"Added {voice_to_add} VOICE to user {user_id}'s balance.")
