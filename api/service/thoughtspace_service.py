@@ -23,37 +23,12 @@ class ThoughtSpaceService:
         messages = [self.scored_point_to_message(result) for result in search_results]
         return MessagesResponse(messages=messages)
 
-    async def deduplicate_messages(self, messages: List[Message]) -> List[Message]:
-        print("start dedup")
-        print(len(messages))
-        # Normalize content by stripping whitespace and converting to lowercase
-        normalized_content = lambda message: message.content.strip().lower()
-        # Sort messages by created_at timestamp to ensure earlier messages are prioritized
-        messages.sort(key=lambda message: message.created_at)
-        print("sorted messages")
-        print(messages[:10])
-
-        unique_messages_dict = {}
-        for message in messages:
-            content_key = normalized_content(message)
-            if content_key not in unique_messages_dict:
-                unique_messages_dict[content_key] = message
-
-        unique_messages = list(unique_messages_dict.values())
-        print(f"unique count: {len(unique_messages)}")
-        return unique_messages
-
-    # Additional methods for curating messages, etc., can be added here
-
     def dedup(self, messages: List[Message]) -> List[Message]:
-        print("start dedup")
-        print(len(messages))
         # Normalize content by stripping whitespace and converting to lowercase
         normalized_content = lambda message: message.content.strip().lower()
 
         # Sort messages by created_at timestamp to ensure earlier messages are prioritized
         messages.sort(key=lambda message: message.created_at)
-        print("sorted messages")
 
         unique_contents = set()
         deduplicated_messages = []
@@ -62,8 +37,6 @@ class ThoughtSpaceService:
             if content_key not in unique_contents:
                 unique_contents.add(content_key)
                 deduplicated_messages.append(message)
-        print(f"unique count: {len(deduplicated_messages)}")
-        print(f"uniques: {deduplicated_messages}")
         return deduplicated_messages
 
     def rerank(self, messages):
@@ -114,7 +87,7 @@ class ThoughtSpaceService:
             "similarity": message.similarity_score,
             "voice": message.voice,
             "curations_count": message.curations_count,
-            "novelty": (1 - message.similarity_score) * message.reranking_score,
+            "novelty": math.sqrt((1 - message.similarity_score) * message.reranking_score),
         }
 
         return {k: v for k, v in fields.items() if v is not None}
@@ -124,17 +97,28 @@ class ThoughtSpaceService:
         novelty_scores = [1 - result.score for result in search_results]
         return novelty_scores
 
-    async def new_message(self, input_text: str, user_id: str):
+    async def new_message(self, input_text: str, user_id: str = str(uuid.uuid4())):
         embedding = await self.thoughtspace_data.embed_text(input_text)
         search_results = await self.thoughtspace_data.search_similar_messages(embedding)
         messages = [self.scored_point_to_message(result) for result in search_results]
-        await self.thoughtspace_data.upsert_message(str(uuid.uuid4()), input_text, embedding)
+        # save message to database
+        message_id = str(uuid.uuid4())
+        await self.thoughtspace_data.upsert_message(message_id, input_text, embedding)
+        print("after upsert")
+        self.thoughtspace_data.create_message(user_id, message_id)
+        print("after create_message")
+
         # Deduplicate and rerank messages
         relevant_messages = self.rerank(self.dedup(messages))
+        print("after relevant_messages")
         # Convert messages to sparse format
         sparse_messages = [self.message_to_sparse_dict(msg) for msg in relevant_messages]
+        print("after sparse_messages")
+
         # Calculate total novelty score
-        total_novelty = sum(1 - msg.similarity_score for msg in relevant_messages)
+        total_novelty = sum(math.sqrt((1 - msg.similarity_score) * msg.reranking_score) for msg in relevant_messages)
+        # "novelty": (1 - message.similarity_score) * message.reranking_score,
+        print("after total_novelty")
         self.thoughtspace_data.update_user_voice_balance(user_id, total_novelty)
         return {"novelty": total_novelty, "messages": sparse_messages}
 

@@ -1,5 +1,6 @@
 import os
 import logging
+from datetime import datetime
 from qdrant_client import AsyncQdrantClient, models
 from qdrant_client.http.exceptions import ApiException, UnexpectedResponse
 
@@ -46,7 +47,7 @@ class QdrantClient:
                 points=[
                     models.PointStruct(
                         id=id,
-                        payload={"content": input_string},
+                        payload={"content": input_string, "created_at": datetime.now()},
                         vector=embedding,
                     )
                 ],

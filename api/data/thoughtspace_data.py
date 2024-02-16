@@ -2,7 +2,7 @@ import uuid
 import logging
 import math
 from typing import List, Optional
-from ._sqlalchemy_models import MESSAGE
+from ._sqlalchemy_models import MESSAGE, USER
 from .qdrant_client import QdrantClient
 from .openai_client import OpenAIClient
 from ..models._message import Message, Curation
@@ -91,7 +91,10 @@ class ThoughtSpaceData:
             raise MessageDeletionException(f"Failed to delete message: {e}")
 
     def update_user_voice_balance(self, user_id: str, voice_amount: float):
+        print("before_query")
+
         user = self.db.query(USER).filter(USER.id == user_id).first()
+        print(f"user: {user}")
         if user:
             # Calculate the floor of the voice_amount and add it to the user's voice score
             voice_to_add = math.floor(voice_amount * 100)
