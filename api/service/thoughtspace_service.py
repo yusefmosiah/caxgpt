@@ -78,26 +78,59 @@ class ThoughtSpaceService:
             created_at=created_at,
         )
 
-    # Method to convert Message object to a sparsified dictionary
+    def record_to_message(self, record):
+        message_id = record.id
+        content = record.payload.get("content", "")
+        # Assuming there's no similarity_score in the record, so we set a default or calculate it differently
+        similarity_score = 0  # or some other default value or calculation
+        voice = record.payload.get("voice", 0)  # Assuming voice might be in the payload
+        curations_payload = record.payload.get("curations", [])
+        created_at_str = record.payload.get("created_at", datetime.now().isoformat())
+
+        created_at = datetime.fromisoformat(created_at_str)
+        voice = voice if voice != 0 else None
+        curations_count = len(curations_payload) if curations_payload else None
+
+        return Message(
+            id=message_id,
+            content=content,
+            similarity_score=similarity_score,
+            voice=voice,
+            curations_count=curations_count,
+            created_at=created_at,
+        )
+
     def message_to_sparse_dict(self, message):
+        # Ensure default values for similarity_score and reranking_score if they are None
+        similarity_score = message.similarity_score if message.similarity_score is not None else 1
+        reranking_score = message.reranking_score if message.reranking_score is not None else 1
+
         fields = {
             "id": str(message.id),
             "content": message.content,
-            "reranking": message.reranking_score,
-            "similarity": message.similarity_score,
+            "reranking": reranking_score,
+            "similarity": similarity_score,
             "voice": message.voice,
             "curations_count": message.curations_count,
-            "novelty": math.sqrt((1 - message.similarity_score) * message.reranking_score),
+            "novelty": math.sqrt((1 - similarity_score) * reranking_score),
         }
-
         return {k: v for k, v in fields.items() if v is not None}
+
+    def records_to_sparse_dicts(self, records):
+
+        messages = [self.record_to_message(record) for record in records]
+        print(f"messages {messages}")
+        # Assuming reranking_score and other calculations are handled elsewhere or set to defaults
+        sparse_dicts = [self.message_to_sparse_dict(message) for message in messages]
+        print(f"sparse_dicts {sparse_dicts}")
+        return sparse_dicts
 
     def calculate_novelty(self, search_results):
         print(f"novelty {search_results[:10]}")
         novelty_scores = [1 - result.score for result in search_results]
         return novelty_scores
 
-    async def new_message(self, input_text: str, user_id: str = str(uuid.uuid4())):
+    async def new_message(self, input_text: str, user_id: str):
         embedding = await self.thoughtspace_data.embed_text(input_text)
         search_results = await self.thoughtspace_data.search_similar_messages(embedding)
         messages = [self.scored_point_to_message(result) for result in search_results]
@@ -121,6 +154,23 @@ class ThoughtSpaceService:
         print("after total_novelty")
         self.thoughtspace_data.update_user_voice_balance(user_id, total_novelty)
         return {"novelty": total_novelty, "messages": sparse_messages}
+
+    async def get_dashboard_data(self, user_id: str):
+        # Fetch user voice balance and message IDs from the database
+        user_data = self.thoughtspace_data.get_user_voice_balance_and_messages(user_id)
+        if not user_data:
+            return None  # Or handle the case where the user or messages are not found
+
+        # Retrieve messages from Qdrant using the message IDs
+        msg_ids = [str(msg_id) for msg_id in user_data["message_ids"]]
+        records = await self.thoughtspace_data.retrieve_messages(msg_ids)
+        print("after retreive")
+
+        # Convert the retrieved records to Message instances, then to sparse dictionaries
+        sparse_messages = self.records_to_sparse_dicts(records)
+
+        # Return the user's voice balance and their messages in sparse dictionary form
+        return {"voice_balance": user_data["voice_balance"], "messages": sparse_messages}
 
     # async def quote_messages(self, id_voice_pairs: dict) -> None:
     #     """

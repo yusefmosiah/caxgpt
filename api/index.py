@@ -319,7 +319,32 @@ async def new_message_endpoint(
     """
     try:
         service = ThoughtSpaceService(db=db)  # Initialize the service with the db session
-        response = await service.new_message(request.input_text, user_id)
+        response = await service.new_message(request.input_text, str(user_id))
         return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/dashboard", tags=["Dashboard"])
+async def dashboard(
+    db: Session = Depends(get_db),
+    user_id: UUID = Depends(get_current_user_dep),
+):
+    """
+    Dashboard endpoint to get the user's voice balance and messages.
+
+    Args:
+        db (Session, optional): Dependency Injection
+        user_id (UUID, optional): Dependency Injection
+
+    Returns:
+        dict: User's voice balance and messages
+    """
+    try:
+        service = ThoughtSpaceService(db=db)
+        dashboard_data = await service.get_dashboard_data(str(user_id))
+        if dashboard_data is None:
+            raise HTTPException(status_code=404, detail="User not found or no messages available.")
+        return dashboard_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

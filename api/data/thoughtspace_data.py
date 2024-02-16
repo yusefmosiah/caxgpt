@@ -90,6 +90,15 @@ class ThoughtSpaceData:
             logger.error(f"Failed to delete message: {e}")
             raise MessageDeletionException(f"Failed to delete message: {e}")
 
+    def get_user_voice_balance_and_messages(self, user_id: str):
+        user = self.db.query(USER).filter(USER.id == user_id).first()
+        if not user:
+            logger.error(f"User with ID {user_id} not found")
+            return None
+        messages = self.db.query(MESSAGE.id).filter(MESSAGE.user_id == user_id).all()
+        message_ids = [message.id for message in messages]
+        return {"voice_balance": user.voice, "message_ids": message_ids}
+
     def update_user_voice_balance(self, user_id: str, voice_amount: float):
         print("before_query")
 
