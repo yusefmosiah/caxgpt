@@ -350,6 +350,7 @@ async def dashboard(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/api/resonance_search")
 async def resonance_search_endpoint(
     request: NewMessageRequest,

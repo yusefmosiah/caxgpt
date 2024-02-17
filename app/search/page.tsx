@@ -4,7 +4,17 @@ import React, { useState } from "react";
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
   // Update the initial state to be more specific about the type of data expected
-  const [searchResults, setSearchResults] = useState<Array<{id: string, content: string, similarity_score: number, reranking_score?: number, voice?: number, curations_count?: number, created_at: string}>>([]);
+  const [searchResults, setSearchResults] = useState<
+    Array<{
+      id: string;
+      content: string;
+      similarity_score: number;
+      reranking_score?: number;
+      voice?: number;
+      curations_count?: number;
+      created_at?: string;
+    }>
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -62,9 +72,19 @@ export default function SearchPage() {
           <ul>
             {searchResults.map((result) => (
               <li key={result.id}>
+                {result.voice && <p>Voice: {result.voice}</p>}
+                <p>ID: {result.id}</p>
                 <p>Content: {result.content}</p>
                 <p>Similarity Score: {result.similarity_score}</p>
-                {/* Render other properties as needed */}
+                {result.reranking_score && (
+                  <p>Reranking Score: {result.reranking_score}</p>
+                )}
+                {result.curations_count && (
+                  <p>Curations Count: {result.curations_count}</p>
+                )}
+                {result.created_at && (
+                  <p>Created At: {result.created_at}</p>
+                )}
               </li>
             ))}
           </ul>
