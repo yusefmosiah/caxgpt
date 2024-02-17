@@ -4,9 +4,10 @@
  * @type {string[]}
  */
 export const publicRoutes = [
-    "/"
+    "/",
+    "/search"
   ];
-  
+
   /**
    * An array of routes that are used for authentication
    * These routes will redirect logged in users to /dashboard
@@ -16,7 +17,7 @@ export const publicRoutes = [
     "/auth/login",
     "/auth/register",
   ];
-  
+
   /**
    * The prefix for API authentication routes
    * Routes that start with this prefix are used for API authentication purposes
@@ -24,7 +25,7 @@ export const publicRoutes = [
    */
   export const apiAuthPrefix = "/api";
   // export const apiAuthPrefix = "/api/auth";
-  
+
   /**
    * The default redirect path after logging in
    * @type {string}

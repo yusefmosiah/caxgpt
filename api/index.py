@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI, HTTPException, Query, Form
 from fastapi.security import OAuth2PasswordRequestForm
 
+import uuid
 from uuid import UUID
 
 from .service.thoughtspace_service import ThoughtSpaceService
@@ -346,5 +347,21 @@ async def dashboard(
         if dashboard_data is None:
             raise HTTPException(status_code=404, detail="User not found or no messages available.")
         return dashboard_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/resonance_search")
+async def resonance_search_endpoint(
+    request: NewMessageRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Endpoint for similarity search accessible to all users, including unauthenticated ones.
+    """
+    try:
+        anonymous_user_id = "anonymous"  # Handle as needed for anonymous searches
+        service = ThoughtSpaceService(db=db)
+        response = await service.search(request.input_text)
+        return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

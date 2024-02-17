@@ -40,6 +40,7 @@ class ThoughtSpaceService:
         return deduplicated_messages
 
     def rerank(self, messages):
+        print("reranking")
         now = datetime.now()
         for msg in messages:
             # Check if msg.voice is None and default to 1 before applying sqrt
@@ -48,6 +49,8 @@ class ThoughtSpaceService:
             msg.reranking_score = ((100 * msg.similarity_score * voice_value) ** (msg.curations_count or 1.0)) / (
                 now - msg.created_at
             ).total_seconds()
+
+        print("done ranking")
         return sorted(messages, key=lambda msg: msg.reranking_score, reverse=True)
 
     def scored_point_to_message(self, scored_point: ScoredPoint) -> Message:
@@ -171,6 +174,20 @@ class ThoughtSpaceService:
 
         # Return the user's voice balance and their messages in sparse dictionary form
         return {"voice_balance": user_data["voice_balance"], "messages": sparse_messages}
+
+    async def search(self, input_text: str) -> List[dict]:
+        # Embed the input text
+        embedding = await self.thoughtspace_data.embed_text(input_text)
+        # Search Qdrant for similar messages
+        search_results = await self.thoughtspace_data.search_similar_messages(embedding)
+        # Convert search results to Message instances
+        messages = [self.scored_point_to_message(result) for result in search_results]
+        # Deduplicate and rerank messages
+        resonant_messages = self.rerank(self.dedup(messages))
+        # Convert messages to sparse format
+        # sparse_messages = [self.message_to_sparse_dict(msg) for msg in resonant_messages]
+        # print("sparse now")
+        return resonant_messages
 
     # async def quote_messages(self, id_voice_pairs: dict) -> None:
     #     """
