@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, validator
 from typing import List, Optional
 from uuid import UUID
 from datetime import datetime
@@ -23,7 +23,7 @@ class Message(BaseModel):
     curations_count: Optional[int] = None  # Replace curations list with count, default to None
     created_at: datetime = Field(default_factory=datetime.now)
 
-    @field_validator("voice", pre=True, always=True)
+    @validator("voice", pre=True, always=True)
     def convert_voice_to_int(cls, v):
         if v is None:
             return None
