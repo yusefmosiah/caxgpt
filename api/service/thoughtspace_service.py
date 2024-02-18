@@ -46,9 +46,11 @@ class ThoughtSpaceService:
             # Check if msg.voice is None and default to 1 before applying sqrt
             voice_value = 1 if msg.voice is None else msg.voice**0.1
             # Use voice_value in the calculation, which will be 1 if msg.voice was None
-            msg.reranking_score = ((100 * msg.similarity_score * voice_value) ** (msg.curations_count or 1.0)) / (
+            rerank = ((100 * msg.similarity_score * voice_value) ** (msg.curations_count or 1.0)) / (
                 now - msg.created_at
             ).total_seconds()
+            rerank_adjusted = rerank + 1  # in case 0 < rerank < 1
+            msg.reranking_score = math.log(rerank_adjusted)
 
         print("done ranking")
         return sorted(messages, key=lambda msg: msg.reranking_score, reverse=True)
@@ -153,7 +155,7 @@ class ThoughtSpaceService:
 
         # Calculate total novelty score
         total_novelty = sum(math.sqrt((1 - msg.similarity_score) * msg.reranking_score) for msg in relevant_messages)
-        # "novelty": (1 - message.similarity_score) * message.reranking_score,
+
         print("after total_novelty")
         self.thoughtspace_data.update_user_voice_balance(user_id, total_novelty)
         return {"novelty": total_novelty, "messages": sparse_messages}
