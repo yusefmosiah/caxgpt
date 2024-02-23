@@ -55,8 +55,14 @@ class ThoughtSpaceService:
         print("done ranking")
         return sorted(messages, key=lambda msg: msg.reranking_score, reverse=True)
 
-    def scored_point_to_message(self, scored_point: ScoredPoint) -> Message:
-        message_id = scored_point.id
+    def scored_point_to_message(self, scored_point: ScoredPoint) -> Message:        # Check if scored_point.id is None
+        if isinstance(scored_point.id, int):
+            print("scored_point.id is int, handling case")
+            message_id = uuid.uuid4()
+            print(f"message_id {message_id}")
+        else:
+            message_id = uuid.UUID(scored_point.id)
+
         content = scored_point.payload.get("content", "")
         similarity_score = scored_point.score  # Assuming ScoredPoint has a 'score' attribute
         voice = scored_point.payload.get("voice", 0)
@@ -109,7 +115,6 @@ class ThoughtSpaceService:
         # Ensure default values for similarity_score and reranking_score if they are None
         similarity_score = message.similarity_score if message.similarity_score is not None else 1
         reranking_score = message.reranking_score if message.reranking_score is not None else 1
-
         fields = {
             "id": str(message.id),
             "content": message.content,
@@ -117,7 +122,8 @@ class ThoughtSpaceService:
             "similarity": similarity_score,
             "voice": message.voice,
             "curations_count": message.curations_count,
-            "novelty": math.sqrt((1 - similarity_score) * reranking_score),
+            # similarity score for exact matches = 1.000001, and this messes with math
+            "novelty": math.sqrt((1.0001 - similarity_score) * reranking_score),
         }
         return {k: v for k, v in fields.items() if v is not None}
 
@@ -135,29 +141,90 @@ class ThoughtSpaceService:
         novelty_scores = [1 - result.score for result in search_results]
         return novelty_scores
 
+    async def reward_authors_of_relevant_messages(self, relevant_messages):
+        print("reward_authors_of_relevant_messages")
+        voice_rewards = {}  # Dictionary to hold aggregated voice rewards
+
+        # Step 1: Batch fetch user IDs for message authors
+        message_ids = [str(msg.id) for msg in relevant_messages]
+        message_user_mapping = self.thoughtspace_data.get_messages_user_mapping(message_ids)
+
+        # Process each message_id in the mapping
+        for message_id, author_id in message_user_mapping.items():
+            # Find the relevant message object to calculate its voice reward
+            relevant_message = next((msg for msg in relevant_messages if str(msg.id) == message_id), None)
+            if relevant_message is None:
+                print("relevant_message is none")
+                continue  # Skip if the message object is not found in the relevant_messages list
+
+            voice_reward = self.calculate_voice_reward(relevant_message)
+
+            # Aggregate voice rewards by author_id
+            if author_id in voice_rewards:
+                voice_rewards[author_id] += voice_reward
+            else:
+                voice_rewards[author_id] = voice_reward
+
+        # Bulk update voice balances
+        await self.thoughtspace_data.bulk_update_user_voice_balances(voice_rewards)
+        print(f"Processed rewards for {len(message_user_mapping)} messages")
+        # Bulk update voice balances
+
+    def calculate_voice_reward(self, message):
+        # Example reward calculation based on reranking score
+        # Ensure reranking_score is initialized and not None
+        reranking_score = message.reranking_score if message.reranking_score is not None else 0
+
+        # Simple reward calculation: a base reward plus a multiplier of the reranking score
+        # Adjust the base_reward and multiplier as needed
+        base_reward = 1  # Minimum reward
+        multiplier = 0.5  # Adjust based on how much you want the reranking score to influence the reward
+
+        # Calculate the reward
+        reward = base_reward + (multiplier * reranking_score)
+
+        # Ensure the reward is a positive number
+        reward = max(reward, 0)
+        print(f"reward {reward} for message {message.id}")
+
+        return reward
+
     async def new_message(self, input_text: str, user_id: str):
+        print("in new msg 4")
+        # Embed the input text to get its embedding
         embedding = await self.thoughtspace_data.embed_text(input_text)
+        print("in new msg 5")
+        # Search for similar messages based on the embedding
         search_results = await self.thoughtspace_data.search_similar_messages(embedding)
+        print("in new msg 6")
+        # Convert search results to Message objects
         messages = [self.scored_point_to_message(result) for result in search_results]
-        # save message to database
+        print("in new msg 7")
+
+        # Save the new message to the database
         message_id = str(uuid.uuid4())
+        print("in new msg 8")
         await self.thoughtspace_data.upsert_message(message_id, input_text, embedding)
-        print("after upsert")
         self.thoughtspace_data.create_message(user_id, message_id)
-        print("after create_message")
 
-        # Deduplicate and rerank messages
+        # Deduplicate and rerank messages to find relevant ones
         relevant_messages = self.rerank(self.dedup(messages))
-        print("after relevant_messages")
-        # Convert messages to sparse format
+
+        # Reward authors of relevant messages
+        print(f"relevant_messages")
+        self.reward_authors_of_relevant_messages(relevant_messages)
+        print("rewarded authors")
+        # Convert messages to a sparse format for the response
         sparse_messages = [self.message_to_sparse_dict(msg) for msg in relevant_messages]
-        print("after sparse_messages")
+        print(f"top 3 sparse_messages {sparse_messages[:3]}")
+        # Calculate total novelty score for the user based on relevant messages
+        total_novelty = sum(math.sqrt((1.0001 - msg.similarity_score) * msg.reranking_score) for msg in relevant_messages)
 
-        # Calculate total novelty score
-        total_novelty = sum(math.sqrt((1 - msg.similarity_score) * msg.reranking_score) for msg in relevant_messages)
-
-        print("after total_novelty")
+        # Update the user's VOICE balance based on the total novelty score
+        print(f"user_id: {user_id}, total_novelty: {total_novelty}")
         self.thoughtspace_data.update_user_voice_balance(user_id, total_novelty)
+        print("after updating user_voice")
+        # Return the novelty score and sparse messages in the response
         return {"novelty": total_novelty, "messages": sparse_messages}
 
     async def get_dashboard_data(self, user_id: str):
@@ -190,26 +257,3 @@ class ThoughtSpaceService:
         # sparse_messages = [self.message_to_sparse_dict(msg) for msg in resonant_messages]
         # print("sparse now")
         return resonant_messages
-
-    # async def quote_messages(self, id_voice_pairs: dict) -> None:
-    #     """
-    #     finding the right input and output types is a bit tricky here
-    #     """
-    #     for message_id, voice in id_voice_pairs.items():
-    #         message = await self.thoughtspace_data.get_message(message_id)
-    #         if message:
-    #             new_voice = message.voice + voice
-    #             await self.thoughtspace_data.update_message_voice(message_id, new_voice)
-
-    # async def curate_message(self, point_id: str, quantity_of_voice: int, message: str, user_id: str) -> dict:
-    #     """
-    #     finding the right input and output types is a bit tricky here
-    #     """
-    #     new_message_result = await self.new_message(message)
-    #     point = await self.thoughtspace_data.get_message(point_id)
-    #     if point:
-    #         curations = point.curations if point.curations else []
-    #         curations.append({"user_id": user_id, "message_id": new_message_result.id})
-    #         new_voice = point.voice + quantity_of_voice
-    #         await self.thoughtspace_data.update_message_curations_and_voice(point_id, curations, new_voice)
-    #     return {"updated_point": point, "new_message_result": new_message_result}
