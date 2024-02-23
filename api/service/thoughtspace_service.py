@@ -166,7 +166,7 @@ class ThoughtSpaceService:
                 voice_rewards[author_id] = voice_reward
 
         # Bulk update voice balances
-        await self.thoughtspace_data.bulk_update_user_voice_balances(voice_rewards)
+        self.thoughtspace_data.bulk_update_user_voice_balances(voice_rewards)
         print(f"Processed rewards for {len(message_user_mapping)} messages")
         # Bulk update voice balances
 
