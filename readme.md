@@ -1,102 +1,46 @@
-# Choir
+# Choir: A New Era of Social Media
 
-Aspirationally, Choir Chat is a metachat app — initially in the form of a gpt — that turns the chat thread into an interface into a "socioeconomic media platform" new form of social media.
+Welcome to Choir, an innovative platform designed to redefine the landscape of social media. Choir is not just another social network; it's a groundbreaking socioeconomic media platform that leverages the power of artificial intelligence to foster a community where every voice matters. Our mission is to create a space that encourages intelligent, civil discourse and the coexistence of diverse perspectives.
 
-Indeed, Choir Chat is the world's first AI native social media platform.
+## Why Choir Stands Out
 
-The primary objective motivating the development of Choir is the need for a new form of social discourse, one that is intelligent, civil, and inclusive of the broad range of perspectives that comprise humanity.
+In the current social media ecosystem, a small fraction of users generate the majority of content, leading to a passive consumption culture. Choir challenges this dynamic by offering a unique incentive system that motivates all users to engage actively and contribute quality content. Here's how we're making a difference:
 
-Current social media platforms fail in that most users consume the content that a small minority creates.
+### Intelligent and Civil Discourse
 
-Chat apps — and ChatGPT as a special case — show that all people have something to say. It's just that on social media as we know it, most people don't have good incentives for posting.
+Choir is built on the foundation of promoting harmony and understanding across a wide range of perspectives. By leveraging advanced AI, including content moderation capabilities, we ensure discussions remain respectful and productive.
 
-The way that social algorithms work, most content created by most users gets minimal attention. And given the way that society processes social media, one would rather have an empty social profile than post a lot but have low follower count.
+### Anonymity with Accountability
 
-Really, the downside of posting something that sends the wrong impression — everything offends someone these days, it seems — outweighs the upside of posting, in most cases.
+Understanding the delicate balance between freedom of expression and the potential for misuse, Choir employs anonymity alongside a robust moderation system. This approach encourages open dialogue while maintaining a respectful environment.
 
-The solution to the problem of oversensitivity and self censorship is of course anonymity, a solution that brings its own problems. Anonymity means sometimes people feel licensed to express their worst qualities, and you get eg 4chan.
+## How Choir Works
 
-For this reason, Choir is built as a gpt, leveraging chatgpt's content moderation. If anything, this means the content may be too tame.
+Choir introduces a revolutionary incentive model comprising three core mechanisms, designed to reward users for their contributions and engagement:
 
-## Socioeconomic media
+### 1. Novelty Reward
 
-But removing disincentives for posting with anonymity is not enough. Users need positive incentives to post their thoughts with the internet public.
+Innovation is at the heart of Choir. When you post a message, our system evaluates its uniqueness compared to existing content. The more original your message, the higher the reward in VOICE, our platform's currency.
 
-The people who do post often on social media get social, financial, and political value for the time and energy they expend creating content.
+### 2. Quotation Reward
 
-However, most people aren't in a position where the value they get from social media outweighs the cost.
+The impact of your message is recognized when others quote it. Each time your message is quoted, you earn VOICE, acknowledging the value of your contribution to the community.
 
-With Choir, all users get value for the time and energy they contribute.
+### 3. Revision Proposals
 
-A complex content ecosystem, Choir has 3 different incentive systems that together create an environment which encourages and rewards contributing novel ideas before they beocome widely considered to be important.
+Choir believes in the power of collaboration. Users can propose revisions to existing posts, offering a new perspective or enhancing the message. Successful revisions not only reward the revising author but also increase the post's visibility and ranking within the platform.
 
-In essence, Choir incentivizes people to compete to cooperate to create quality content about complex concepts.
+## Engaging with Choir
 
-### NOVELTY REWARD
+Choir.chat serves as the gateway to this vibrant community, requiring users to log in to access the full suite of features:
 
-Each message you post with Choir, your message gets compared with all other messages in the Choir database, and the more different the content is from all existing content, the greater your reward in VOICE
+- **Account Dashboard**: Track your VOICE balance, unread messages, revisions count, and more.
+- **Message Lists**: Explore unread messages, your contributions, and conversations you're part of, all organized for easy navigation.
+- **Message Component**: Dive into the content and metadata of messages, including their VOICE total and the impact they've made.
+- **Revise Message Component**: Contribute to the ecosystem by investing VOICE in messages, suggesting revisions, and becoming part of the message's history.
 
-### QUOTATION REWARD
+## Joining Choir
 
-Each message Choir receives gets compared to all other messages in the Choir database, and the most valualbe, relevant, similar messages get quoted to you by the choir gpt
-The authors of all quoted messages get rewarded VOICE
+To experience Choir, users must create an account on choir.chat. Once logged in, you'll be part of a community that values your voice and rewards your contributions. Whether you're sharing novel ideas, quoting insightful messages, or collaborating through revisions, Choir offers a unique platform to engage with content that matters.
 
-### CURATION MARKET
-
-When you come across a message that you value, you can invest some of your VOICE in it, increasing its probability of getting quoted to other users, and rewarding its author and prior curators.
-Essentially, curation is paying to get more attention on the message and simultaneously betting that it will get curated by others in the future.
-When you curate, you may optionally add a message to send to the author and prior curators.
-In effect, curators of a message form a private group chat with its author
-
-
-These 3 incentivized interactions are conducted within the choir gpt,
-
-To use choir gpt, you must be logged into an account on choir.chat. If you are not currently logged in, you will be directed from within chatgpt to register or login to your account.
-
-## Choir.chat
-
-Choir.chat allows signed-in users to view, search, curate, edit, and delete (from choir, not from chatgpt) their own messages, as well as view, search, and curate other user's messages.
-
-There needs to be an account dashboard component search component, a list_of_messages component, a message component, and a curate_message component
-
-account dashboard:
-
-- VOICE balance
-- unread messages count
-- curated messages count
-- quoted by messages count
-- authored messages count
-- more stats derived from these tbd
-
-
-message lists:
-
-- unread messages
-    - unread messages that quote one of my messages
-    - unread messages from cocurators of messages ive curated
-- user's messages
-    - user-authored messages
-    - user-curated messages
-- conversations
-    - messages that quote one of my messages
-    - messages from cocurators of messagesi ive curated
-- all messages
-
-sort orders:
-- recency
-- VOICE
-- curator count
-- quotation count
-
-
-message component displays message content and metadata
-
-- content
-- metadata
-    - created_at_time
-    - VOICE_TOTAL = VOICE_INVESTED + VOICE_REWARDED
-        - dict of curator_id: VOICE_INVESTED
-        - dict of messages that quote it: VOICE_REWARDED
-- author_id is not returned by api or displayed to users
-
-curate_message component has parameters for amount of VOICE to invest, optional message text
+Choir is more than a social media platform; it's a movement towards a more inclusive, thoughtful, and rewarding digital discourse. Join us in shaping the future of social media.
