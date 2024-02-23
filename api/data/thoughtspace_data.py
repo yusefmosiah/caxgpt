@@ -33,8 +33,11 @@ class ThoughtSpaceData:
         logger.info("ThoughtSpaceData initialized")
 
     async def embed_text(self, input_text: str) -> Optional[List[float]]:
-        logger.info(f"Embedding text: {input_text[:30]}...")
-        return await self.openai_client.embed(input_text)
+        try:
+            return await self.openai_client.embed(input_text)
+        except Exception as e:
+            logger.error(f"Failed to embed text: {e}")
+            raise
 
     async def search_similar_messages(
         self, embedding: List[float], search_limit: int = 200, with_vectors: bool = False

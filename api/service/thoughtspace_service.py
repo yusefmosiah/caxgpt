@@ -6,7 +6,9 @@ from qdrant_client.http.models import ScoredPoint
 from sqlalchemy.orm import Session
 import math
 import uuid
+import logging
 
+logger = logging.getLogger(__name__)
 
 class ThoughtSpaceService:
     def __init__(self, db: Session):
@@ -15,13 +17,14 @@ class ThoughtSpaceService:
     async def embed_and_search_messages(
         self, input_text: str, search_limit: int = 200, with_vectors: bool = False
     ) -> MessagesResponse:
-        """
-        Embeds the input text using OpenAI, searches for similar messages using Qdrant, and returns the search results.
-        """
-        embedding = await self.thoughtspace_data.embed_text(input_text)
-        search_results = await self.thoughtspace_data.search_similar_messages(embedding, search_limit, with_vectors)
-        messages = [self.scored_point_to_message(result) for result in search_results]
-        return MessagesResponse(messages=messages)
+        try:
+            embedding = await self.thoughtspace_data.embed_text(input_text)
+            search_results = await self.thoughtspace_data.search_similar_messages(embedding, search_limit, with_vectors)
+            messages = [self.scored_point_to_message(result) for result in search_results]
+            return MessagesResponse(messages=messages)
+        except Exception as e:
+            logger.error(f"Failed to embed and search messages: {e}")
+            raise
 
     def dedup(self, messages: List[Message]) -> List[Message]:
         # Normalize content by stripping whitespace and converting to lowercase
@@ -55,13 +58,16 @@ class ThoughtSpaceService:
         print("done ranking")
         return sorted(messages, key=lambda msg: msg.reranking_score, reverse=True)
 
-    def scored_point_to_message(self, scored_point: ScoredPoint) -> Message:        # Check if scored_point.id is None
-        if isinstance(scored_point.id, int):
-            print("scored_point.id is int, handling case")
-            message_id = uuid.uuid4()
-            print(f"message_id {message_id}")
-        else:
-            message_id = uuid.UUID(scored_point.id)
+    def scored_point_to_message(self, scored_point: ScoredPoint) -> Message:
+        try:
+            if isinstance(scored_point.id, int):
+                logger.info("scored_point.id is int, handling case")
+                message_id = uuid.uuid4()
+            else:
+                message_id = uuid.UUID(scored_point.id)
+        except ValueError:
+            logger.error(f"Invalid UUID format: {scored_point.id}")
+            message_id = uuid.uuid4()  # Fallback to generating a new UUID
 
         content = scored_point.payload.get("content", "")
         similarity_score = scored_point.score  # Assuming ScoredPoint has a 'score' attribute
