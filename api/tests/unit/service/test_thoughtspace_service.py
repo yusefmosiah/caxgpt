@@ -13,7 +13,7 @@ def test_scored_point_to_message(thoughtspace_service):
     # Mocking a ScoredPoint object
     scored_point = ScoredPoint(
         id="test_id",
-        payload={"content": "Test content", "voice": 1, "curations": ["curation1", "curation2"]},
+        payload={"content": "Test content", "voice": 1, "revisions": ["revision1", "revision2"]},
         score=0.95,
     )
 
@@ -25,4 +25,4 @@ def test_scored_point_to_message(thoughtspace_service):
     assert message.content == "Test content"
     assert message.similarity_score == 0.95
     assert message.voice == 1
-    assert message.curations_count == 2
+    assert message.revisions_count == 2

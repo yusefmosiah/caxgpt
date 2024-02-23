@@ -8,7 +8,7 @@ class NewMessageRequest(BaseModel):
     input_text: str
 
 
-class Curation(BaseModel):
+class Revision(BaseModel):
     user_id: str
     message_id: str
     created_at: datetime = Field(default_factory=datetime.now)
@@ -20,7 +20,7 @@ class Message(BaseModel):
     similarity_score: float
     reranking_score: Optional[float] = None
     voice: Optional[int] = None  # Change default to None
-    curations_count: Optional[int] = None  # Replace curations list with count, default to None
+    revisions_count: Optional[int] = None  # Replace revisions list with count, default to None
     created_at: datetime = Field(default_factory=datetime.now)
 
     @validator("voice", pre=True, always=True)

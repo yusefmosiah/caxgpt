@@ -10,7 +10,7 @@ export default function SearchPage() {
       similarity_score: number;
       reranking_score?: number;
       voice?: number;
-      curations_count?: number;
+      revisions_count?: number;
       created_at?: string;
     }>
   >([]);
@@ -75,20 +75,25 @@ export default function SearchPage() {
         {searchResults.length > 0 && (
           <ul>
             {searchResults.map((result) => (
-              <li key={result.id} className="mb-4 p-4 bg-gray-800 bg-opacity-80 rounded-lg">
-                {result.voice && <p className="text-lg font-semibold text-blue-400">Voice: {result.voice}</p>}
+              <li
+                key={result.id}
+                className="mb-4 p-4 bg-gray-800 bg-opacity-80 rounded-lg"
+              >
+                {result.voice && (
+                  <p className="text-lg font-semibold text-blue-400">
+                    Voice: {result.voice}
+                  </p>
+                )}
                 <p>ID: {result.id}</p>
                 <p className="text-xl font-bold">Content: {result.content}</p>
                 <p>Similarity Score: {result.similarity_score}</p>
                 {result.reranking_score && (
                   <p>Reranking Score: {result.reranking_score}</p>
                 )}
-                {result.curations_count && (
-                  <p>Curations Count: {result.curations_count}</p>
+                {result.revisions_count && (
+                  <p>Revisions Count: {result.revisions_count}</p>
                 )}
-                {result.created_at && (
-                  <p>Created At: {result.created_at}</p>
-                )}
+                {result.created_at && <p>Created At: {result.created_at}</p>}
               </li>
             ))}
           </ul>

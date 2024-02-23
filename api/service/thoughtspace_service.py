@@ -1,6 +1,6 @@
 from typing import List
 from ..data.thoughtspace_data import ThoughtSpaceData
-from ..models._message import Message, Curation, MessagesResponse
+from ..models._message import Message, Revision, MessagesResponse
 from datetime import datetime
 from qdrant_client.http.models import ScoredPoint
 from sqlalchemy.orm import Session
@@ -49,7 +49,7 @@ class ThoughtSpaceService:
             # Check if msg.voice is None and default to 1 before applying sqrt
             voice_value = 1 if msg.voice is None else msg.voice**0.1
             # Use voice_value in the calculation, which will be 1 if msg.voice was None
-            rerank = ((100 * msg.similarity_score * voice_value) ** (msg.curations_count or 1.0)) / (
+            rerank = ((100 * msg.similarity_score * voice_value) ** (msg.revisions_count or 1.0)) / (
                 now - msg.created_at
             ).total_seconds()
             rerank_adjusted = rerank + 1  # in case 0 < rerank < 1
@@ -72,7 +72,7 @@ class ThoughtSpaceService:
         content = scored_point.payload.get("content", "")
         similarity_score = scored_point.score  # Assuming ScoredPoint has a 'score' attribute
         voice = scored_point.payload.get("voice", 0)
-        curations_payload = scored_point.payload.get("curations", [])
+        revisions_payload = scored_point.payload.get("revisions", [])
         created_at_str = scored_point.payload.get(
             "created_at", datetime.now().isoformat()
         )  # Default to now if not present
@@ -83,15 +83,15 @@ class ThoughtSpaceService:
         # Only include voice if it's not 0
         voice = voice if voice != 0 else None
 
-        # Replace list of curations with count, only include if count is not 0
-        curations_count = len(curations_payload) if curations_payload else None
+        # Replace list of revisions with count, only include if count is not 0
+        revisions_count = len(revisions_payload) if revisions_payload else None
 
         return Message(
             id=message_id,
             content=content,
             similarity_score=similarity_score,
             voice=voice,
-            curations_count=curations_count,
+            revisions_count=revisions_count,
             created_at=created_at,
         )
 
@@ -101,19 +101,19 @@ class ThoughtSpaceService:
         # Assuming there's no similarity_score in the record, so we set a default or calculate it differently
         similarity_score = 0  # or some other default value or calculation
         voice = record.payload.get("voice", 0)  # Assuming voice might be in the payload
-        curations_payload = record.payload.get("curations", [])
+        revisions_payload = record.payload.get("revisions", [])
         created_at_str = record.payload.get("created_at", datetime.now().isoformat())
 
         created_at = datetime.fromisoformat(created_at_str)
         voice = voice if voice != 0 else None
-        curations_count = len(curations_payload) if curations_payload else None
+        revisions_count = len(revisions_payload) if revisions_payload else None
 
         return Message(
             id=message_id,
             content=content,
             similarity_score=similarity_score,
             voice=voice,
-            curations_count=curations_count,
+            revisions_count=revisions_count,
             created_at=created_at,
         )
 
@@ -127,7 +127,7 @@ class ThoughtSpaceService:
             "reranking": reranking_score,
             "similarity": similarity_score,
             "voice": message.voice,
-            "curations_count": message.curations_count,
+            "revisions_count": message.revisions_count,
             # similarity score for exact matches = 1.000001, and this messes with math
             "novelty": math.sqrt((1.0001 - similarity_score) * reranking_score),
         }

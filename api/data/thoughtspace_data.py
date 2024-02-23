@@ -5,7 +5,7 @@ from typing import List, Optional
 from ._sqlalchemy_models import MESSAGE, USER
 from .qdrant_client import QdrantClient
 from .openai_client import OpenAIClient
-from ..models._message import Message, Curation
+from ..models._message import Message, Revision
 from sqlalchemy.orm import Session
 from sqlalchemy import update
 
