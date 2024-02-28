@@ -1,4 +1,5 @@
 from typing import List
+from tiktoken import TikToken
 from ..data.thoughtspace_data import ThoughtSpaceData
 from ..models._message import Message, Revision, MessagesResponse, RevisionRequest
 from datetime import datetime
@@ -197,44 +198,22 @@ class ThoughtSpaceService:
         return reward
 
     async def new_message(self, input_text: str, user_id: str):
-        print("in new msg 4")
-        # Embed the input text to get its embedding
         embedding = await self.thoughtspace_data.embed_text(input_text)
-        print("in new msg 5")
-        # Search for similar messages based on the embedding
         search_results = await self.thoughtspace_data.search_similar_messages(embedding)
-        print("in new msg 6")
-        # Convert search results to Message objects
         messages = [self.scored_point_to_message(result) for result in search_results]
-        print("in new msg 7")
-
-        # Save the new message to the database
         message_id = str(uuid.uuid4())
-        print("in new msg 8")
         await self.thoughtspace_data.upsert_message(message_id, input_text, embedding)
         self.thoughtspace_data.create_message(user_id, message_id)
-
-        # Deduplicate and rerank messages to find relevant ones
         relevant_messages = self.rerank(self.dedup(messages))
-
-        # Reward authors of relevant messages
-        print(f"relevant_messages")
         self.reward_authors_of_relevant_messages(relevant_messages)
-        print("rewarded authors")
-        # Convert messages to a sparse format for the response
         sparse_messages = [self.message_to_sparse_dict(msg) for msg in relevant_messages]
-        print(f"top 3 sparse_messages {sparse_messages[:3]}")
-        # Calculate total novelty score for the user based on relevant messages
-        total_novelty = sum(
-            math.sqrt((1.0001 - msg.similarity_score) * msg.reranking_score) for msg in relevant_messages
-        )
 
-        # Update the user's VOICE balance based on the total novelty score
-        print(f"user_id: {user_id}, total_novelty: {total_novelty}")
-        self.thoughtspace_data.update_user_voice_balance(user_id, total_novelty)
-        print("after updating user_voice")
-        # Return the novelty score and sparse messages in the response
-        return {"novelty": total_novelty, "messages": sparse_messages}
+        tokenizer = TikToken()
+        token_count = len(tokenizer.tokenize(input_text))
+
+        self.thoughtspace_data.update_user_voice_balance(user_id, token_count)
+
+        return {"token_count": token_count, "messages": sparse_messages}
 
     async def get_dashboard_data(self, user_id: str):
         # Fetch user voice balance and message IDs from the database
