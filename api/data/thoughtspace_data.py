@@ -164,11 +164,7 @@ class ThoughtSpaceData:
                 print("trying update")
                 for user_id, voice_reward in voice_rewards.items():
                     # Assuming USER model has a column 'voice' for voice balance
-                    self.db.execute(
-                        update(USER).
-                        where(USER.id == user_id).
-                        values(voice=USER.voice + voice_reward)
-                    )
+                    self.db.execute(update(USER).where(USER.id == user_id).values(voice=USER.voice + voice_reward))
                 # Commit the transaction
                 transaction.commit()
             except Exception as e:

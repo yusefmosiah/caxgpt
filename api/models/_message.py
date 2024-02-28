@@ -36,6 +36,7 @@ class Message(BaseModel):
 class MessagesResponse(BaseModel):
     messages: List[Message]
 
+
 class RevisionRequest(BaseModel):
     message_id: UUID
     revised_text: str

@@ -10,6 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class ThoughtSpaceService:
     def __init__(self, db: Session):
         self.thoughtspace_data = ThoughtSpaceData(db=db)
@@ -224,7 +225,9 @@ class ThoughtSpaceService:
         sparse_messages = [self.message_to_sparse_dict(msg) for msg in relevant_messages]
         print(f"top 3 sparse_messages {sparse_messages[:3]}")
         # Calculate total novelty score for the user based on relevant messages
-        total_novelty = sum(math.sqrt((1.0001 - msg.similarity_score) * msg.reranking_score) for msg in relevant_messages)
+        total_novelty = sum(
+            math.sqrt((1.0001 - msg.similarity_score) * msg.reranking_score) for msg in relevant_messages
+        )
 
         # Update the user's VOICE balance based on the total novelty score
         print(f"user_id: {user_id}, total_novelty: {total_novelty}")
