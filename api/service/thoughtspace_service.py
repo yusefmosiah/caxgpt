@@ -1,6 +1,6 @@
 from typing import List
 from ..data.thoughtspace_data import ThoughtSpaceData
-from ..models._message import Message, Revision, MessagesResponse
+from ..models._message import Message, Revision, MessagesResponse, RevisionRequest
 from datetime import datetime
 from qdrant_client.http.models import ScoredPoint
 from sqlalchemy.orm import Session
@@ -263,3 +263,10 @@ class ThoughtSpaceService:
         # sparse_messages = [self.message_to_sparse_dict(msg) for msg in resonant_messages]
         # print("sparse now")
         return resonant_messages
+
+    # async def propose_revision(self, revision_request: RevisionRequest, user_id: str):
+    #     # Validate the message_id and check if the message exists
+    #     # Update the message with revised_text
+    #     # Adjust the user's voice balance based on the voice parameter
+    #     # Return a response indicating success or failure
+    #     return 0
