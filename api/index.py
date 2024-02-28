@@ -25,10 +25,8 @@ app = FastAPI(
     title="Choir",
     description="Choir Chat",
     version="2.0.0",
-    # terms_of_service="https://caxgpt.vercel.app/terms/",
     contact={
         "name": "Yusef Mosiah Nathanson",
-        # "url": "https://caxgpt.vercel.app/contact/",
         "email": "yusef@choir.chat",
     },
     license_info={
