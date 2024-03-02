@@ -3,7 +3,7 @@ import React from 'react';
 interface Message {
   id: string;
   content: string;
-  created_at: string; // Assuming ISO string format
+  created_at?: string; // Assuming ISO string format
   voice?: number;
   similarity_score?: number;
   reranking_score?: number;
@@ -33,7 +33,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
           <div key={message.id} className="message-item p-4 mb-2 border rounded shadow-sm">
             <p className="message-content text-lg font-semibold mb-2">{message.content}</p>
             <div className="message-details text-sm text-gray-600">
-              <p>Created At: {formatDate(message.created_at)}</p>
+            <p>Created At: {message.created_at ? formatDate(message.created_at) : 'N/A'}</p>
               {message.voice && <p>Voice: {message.voice}</p>}
               {message.similarity_score && <p>Similarity Score: {message.similarity_score}</p>}
               {message.reranking_score && <p>Reranking Score: {message.reranking_score}</p>}

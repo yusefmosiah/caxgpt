@@ -1,20 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import MessageList from "@/components/message-list";
+import { Message } from "../../types/message";
 
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<
-    Array<{
-      id: string;
-      content: string;
-      similarity_score: number;
-      reranking_score?: number;
-      voice?: number;
-      revisions_count?: number;
-      created_at?: string;
-    }>
-  >([]);
+  const [searchResults, setSearchResults] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [sortOrder, setSortOrder] = useState<string>("");
@@ -37,8 +28,12 @@ export default function SearchPage() {
         throw new Error("Search failed");
       }
 
-      const data = await response.json();
-      setSearchResults(data);
+      const data: Message[] = await response.json();
+      const resultsWithDefaultDates = data.map((item: Message) => ({
+        ...item,
+        created_at: item.created_at || "1970-01-01T00:00:00Z", // Default to Unix epoch if 'created_at' is undefined
+      }));
+      setSearchResults(resultsWithDefaultDates);
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -49,7 +44,26 @@ export default function SearchPage() {
       setIsLoading(false);
     }
   };
-  const sortResults = (a, b) => {
+  const sortResults = (
+    a: {
+      id: string;
+      content: string;
+      similarity_score: number;
+      reranking_score?: number;
+      voice?: number;
+      revisions_count?: number;
+      created_at?: string;
+    },
+    b: {
+      id: string;
+      content: string;
+      similarity_score: number;
+      reranking_score?: number;
+      voice?: number;
+      revisions_count?: number;
+      created_at?: string;
+    }
+  ) => {
     switch (sortOrder) {
       case "voice":
         return (b.voice || 0) - (a.voice || 0);
@@ -60,9 +74,13 @@ export default function SearchPage() {
       case "revisions_count":
         return (b.revisions_count || 0) - (a.revisions_count || 0);
       case "created_at":
-        return (
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
+        if (b.created_at && a.created_at) {
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        } else {
+          return 0;
+        }
       default:
         return 0;
     }

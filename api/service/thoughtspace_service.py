@@ -1,4 +1,5 @@
 from typing import List
+
 # import tiktoken
 from ..data.thoughtspace_data import ThoughtSpaceData
 from ..models._message import Message, Revision, MessagesResponse, RevisionRequest
