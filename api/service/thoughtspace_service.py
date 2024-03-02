@@ -1,5 +1,5 @@
 from typing import List
-import tiktoken
+# import tiktoken
 from ..data.thoughtspace_data import ThoughtSpaceData
 from ..models._message import Message, Revision, MessagesResponse, RevisionRequest
 from datetime import datetime
@@ -207,7 +207,8 @@ class ThoughtSpaceService:
         relevant_messages = self.rerank(self.dedup(messages))
         self.reward_authors_of_relevant_messages(relevant_messages)
         sparse_messages = [self.message_to_sparse_dict(msg) for msg in relevant_messages]
-        token_count = len(tiktoken.get_encoding("cl100k_base").encode(input_text))
+        # token_count = len(tiktoken.get_encoding("cl100k_base").encode(input_text))
+        token_count = 100
         self.thoughtspace_data.update_user_voice_balance(user_id, token_count)
 
         return {"token_count": token_count, "messages": sparse_messages}

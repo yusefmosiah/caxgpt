@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import MessageList from "@/components/message-list";
 
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,6 +17,7 @@ export default function SearchPage() {
   >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sortOrder, setSortOrder] = useState<string>("");
 
   const handleSearch = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -47,11 +49,40 @@ export default function SearchPage() {
       setIsLoading(false);
     }
   };
-
+  const sortResults = (a, b) => {
+    switch (sortOrder) {
+      case "voice":
+        return (b.voice || 0) - (a.voice || 0);
+      case "similarity_score":
+        return b.similarity_score - a.similarity_score;
+      case "reranking_score":
+        return (b.reranking_score || 0) - (a.reranking_score || 0);
+      case "revisions_count":
+        return (b.revisions_count || 0) - (a.revisions_count || 0);
+      case "created_at":
+        return (
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      default:
+        return 0;
+    }
+  };
   return (
     <div className="bg-black text-white min-h-screen flex flex-col items-center py-8">
       <h1 className="text-4xl font-bold mb-4">Search</h1>
       <form onSubmit={handleSearch} className="w-full max-w-lg">
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="mb-4 w-full p-2 bg-gray-800 text-white"
+        >
+          <option value="">Select Sort Order</option>
+          <option value="voice">Voice</option>
+          <option value="similarity_score">Similarity Score</option>
+          <option value="reranking_score">Reranking Score</option>
+          <option value="revisions_count">Revisions Count</option>
+          <option value="created_at">Created At</option>
+        </select>
         <input
           type="text"
           value={searchTerm}
@@ -67,37 +98,10 @@ export default function SearchPage() {
           Search
         </button>
       </form>
-
       {isLoading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}
-
       <div className="w-full max-w-3xl mt-8">
-        {searchResults.length > 0 && (
-          <ul>
-            {searchResults.map((result) => (
-              <li
-                key={result.id}
-                className="mb-4 p-4 bg-gray-800 bg-opacity-80 rounded-lg"
-              >
-                {result.voice && (
-                  <p className="text-lg font-semibold text-blue-400">
-                    Voice: {result.voice}
-                  </p>
-                )}
-                <p>ID: {result.id}</p>
-                <p className="text-xl font-bold">Content: {result.content}</p>
-                <p>Similarity Score: {result.similarity_score}</p>
-                {result.reranking_score && (
-                  <p>Reranking Score: {result.reranking_score}</p>
-                )}
-                {result.revisions_count && (
-                  <p>Revisions Count: {result.revisions_count}</p>
-                )}
-                {result.created_at && <p>Created At: {result.created_at}</p>}
-              </li>
-            ))}
-          </ul>
-        )}
+        <MessageList messages={searchResults.sort(sortResults)} />
       </div>
     </div>
   );

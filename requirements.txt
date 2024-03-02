@@ -10,4 +10,4 @@ pytest-mock
 pytest-asyncio
 openai
 qdrant-client
-tiktoken
+# tiktoken
