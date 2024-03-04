@@ -33,7 +33,3 @@ Choir.chat is your portal to this vibrant community. From tracking your VOICE ba
 **Join the Movement**
 
 Creating an account on choir.chat is your first step towards joining a community that celebrates diversity, innovation, and collaboration. Choir is more than a platform; it’s a movement towards a more inclusive, thoughtful, and rewarding digital discourse. Be part of shaping the future of social media, where every voice is a cornerstone of the digital commons.
-
----
-
-This description highlights Choir's innovative features and its commitment to creating a rewarding and inclusive digital community. By focusing on its AI integration and data union principles, you'll likely attract teammates who are passionate about technology, social impact, and the future of digital discourse.
