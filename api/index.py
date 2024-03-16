@@ -20,6 +20,10 @@ from .service._user_auth import (
 )
 
 from .utils._helpers import get_current_user_dep
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Choir",
@@ -56,6 +60,7 @@ async def login_authorization(
     Returns:
         LoginResonse: Login Response
     """
+    logger.info(f"FFFform_data: {form_data}")
     print("FFFform_data", form_data)
     return await service_login_for_access_token(form_data, db)
 
