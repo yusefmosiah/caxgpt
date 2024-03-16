@@ -56,6 +56,7 @@ async def login_authorization(
     Returns:
         LoginResonse: Login Response
     """
+    print("FFFform_data", form_data)
     return await service_login_for_access_token(form_data, db)
 
 
