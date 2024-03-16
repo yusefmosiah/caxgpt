@@ -20,7 +20,7 @@ from api.service._user_auth import (
     gpt_tokens_service,
 )
 
-from .utils._helpers import get_current_user_dep
+from api.utils._helpers import get_current_user_dep
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
