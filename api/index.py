@@ -39,7 +39,7 @@ app = FastAPI(
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
     },
     servers=[
-        {"url": "https://caxgpt-lilac.vercel.app", "description": "Production server"},
+        {"url": "https://choirchat.azurewebsites.net/", "description": "Production server"},
     ],
     docs_url="/api/docs",
 )
@@ -59,6 +59,17 @@ app.add_middleware(
 )
 
 # routes
+
+
+@app.get("/api/hello", tags=["Liveness Test"])
+async def hello_world():
+    """
+    Test API route to check liveness
+
+    Returns:
+        str: "Hello, World!"
+    """
+    return {"message": "Hello, World!"}
 
 
 # user_auth.py web layer routes
