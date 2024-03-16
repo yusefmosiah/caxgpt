@@ -23,7 +23,7 @@ from api.service._user_auth import (
 from api.utils._helpers import get_current_user_dep
 import logging
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
@@ -71,6 +71,7 @@ async def hello_world():
     Returns:
         str: "Hello, World!"
     """
+    logger.debug("HELLO endpoint hit")
     return {"message": "Hello, World!"}
 
 
