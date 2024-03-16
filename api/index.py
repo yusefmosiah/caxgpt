@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Form
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 
 import uuid
 from uuid import UUID
@@ -43,6 +44,22 @@ app = FastAPI(
     docs_url="/api/docs",
 )
 
+# Configure CORS
+origins = [
+    "https://caxgpt-lilac.vercel.app",
+    "http://localhost:3000",  # For local development
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# routes
+
 
 # user_auth.py web layer routes
 @app.post("/api/oauth/login", response_model=LoginResonse, tags=["OAuth2 Authentication"])
@@ -61,7 +78,6 @@ async def login_authorization(
         LoginResonse: Login Response
     """
     logger.info(f"FFFform_data: {form_data}")
-    print("FFFform_data", form_data)
     return await service_login_for_access_token(form_data, db)
 
 
