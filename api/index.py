@@ -47,6 +47,8 @@ app = FastAPI(
 # Configure CORS
 origins = [
     "https://caxgpt-lilac.vercel.app",
+    "https://choirchat-git-main-yusef-nathansons-projects.vercel.app/",
+    "https://choirchat-yusef-nathansons-projects.vercel.app/",
     "http://localhost:3000",  # For local development
 ]
 
