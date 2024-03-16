@@ -8,12 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import uuid
 from uuid import UUID
 
-from .service.thoughtspace_service import ThoughtSpaceService
-from .models._message import MessagesResponse, NewMessageRequest, RevisionRequest
+from api.service.thoughtspace_service import ThoughtSpaceService
+from api.models._message import MessagesResponse, NewMessageRequest, RevisionRequest
 
-from .data._db_config import get_db
-from .models._user_auth import RegisterUser, UserOutput, LoginResonse, GPTToken
-from .service._user_auth import (
+from api.data._db_config import get_db
+from api.models._user_auth import RegisterUser, UserOutput, LoginResonse, GPTToken
+from api.service._user_auth import (
     service_signup_users,
     service_login_for_access_token,
     create_access_token,
