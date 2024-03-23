@@ -87,7 +87,7 @@ export const LoginForm = () => {
             setSuccess(data.success);
             toast({
               title: "Login Success",
-              description: data.message ? data.message : "Welcome to Cax AI",
+              description: data.message ? data.message : "Welcome to Choir",
               action: (
                <ToastAction altText="Close">Close</ToastAction>
               ),
