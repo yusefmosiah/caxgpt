@@ -65,7 +65,7 @@ export const LoginForm = () => {
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
-    setSuccess("");    
+    setSuccess("");
 
     startTransition(() => {
       login(values)
@@ -160,6 +160,7 @@ export const LoginForm = () => {
           <Button disabled={isPending} type="submit" className="w-full">
             {"Login"}
           </Button>
+          <Link href="/search">Go to Search</Link>
         </form>
       </Form>
     </CardWrapper>
