@@ -161,6 +161,7 @@ export const LoginForm = () => {
             {"Login"}
           </Button>
           <Link href="/search">Go to Search</Link>
+          <Link href="/api/docs">API Documentation</Link>
         </form>
       </Form>
     </CardWrapper>
