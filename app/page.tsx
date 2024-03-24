@@ -19,11 +19,8 @@ export default async function Home() {
           "text-6xl font-semibold text-white drop-shadow-md",
           font.className,
         )}>
-          🔐 CAX
-        </h1>
-        <p className="text-white text-lg">
           Choir
-        </p>
+        </h1>
         <div className="flex w-full justify-center space-x-2">
           <LoginButton  asChild>
             <Button variant="secondary" size="lg">
