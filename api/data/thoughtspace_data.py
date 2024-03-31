@@ -40,7 +40,7 @@ class ThoughtSpaceData:
             raise
 
     async def search_similar_messages(
-        self, embedding: List[float], search_limit: int = 200, with_vectors: bool = False
+        self, embedding: List[float], search_limit: int = 100, with_vectors: bool = False
     ):
         logger.info(f"Searching for similar messages with search limit {search_limit} and with_vectors={with_vectors}")
         return await self.qdrant_client.search(embedding, search_limit, with_vectors)
